@@ -14,7 +14,7 @@ public struct ProgramData
     };
 
     public static int versionCode = 01;
-    public static string versionName = "v0.0.1-pre";
+    public static string versionName = "v0.0.1-dev";
     public static HttpClient client { get; private set; }
     /// <summary>
     /// Initialize Web stuff used though out the program.

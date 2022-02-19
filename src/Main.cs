@@ -10,11 +10,10 @@ public class MainActivity
     /// The program's main entry point.
     /// </summary>
     /// <param name="args"></param>
-    static void Main(string[] args)
+    static async void Main(string[] args)
     {
         if (args is not null && args.Length >= 1) {
-            switch (ParseArguments(args))
-            {
+            switch (ParseArguments(args)) {
                 // Print help & exit
                 case ProgramModes.HELP:
                     Utils.PrintHelp();
@@ -25,9 +24,16 @@ public class MainActivity
                     Environment.Exit(0);
                     break;
             }
-        } else if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\") && !ProgramData.versionName.Contains("-pre")) {
+        } else if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\") && !ProgramData.versionName.Contains("-dev")) {
 
-            Environment.Exit(0);
+            bool dependencyStatus = await EnvironmentConfig.CheckDependencyState();
+
+            if (!dependencyStatus) {
+                // If corrupted we need to start our HttpClient!
+                ProgramData.InitializeWebVariables();
+                await EnvironmentConfig.RestoreDependencies();
+                Environment.Exit(0);
+            }
         }
     }
 

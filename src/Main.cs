@@ -47,13 +47,13 @@ public class Utils
     public static void PrintHelp()
     {
         AnsiConsole.MarkupLine(
-            "||||----------------------||||\n" +
-            "|||| Meme Downloader 2022 ||||\n" +
-            "||||----------------------||||\n" +
-            "\n" +
-            " [green]-setup[/] = Run initial program setup.\n" +
-            "\n" +
-            " [green]-help[/] = Print this message.\n"
+            "||||----------------------||||\r\n" +
+            "|||| [red]Meme Downloader 2022[/] ||||\r\n" +
+            "||||----------------------||||\r\n" +
+            "\r\n" +
+            " [green]-setup[/] = Run initial program setup.\r\n" +
+            "\r\n" +
+            " [green]-help[/] = Print this message.\r\n"
             );
     }
 }

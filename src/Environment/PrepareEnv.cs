@@ -8,7 +8,7 @@ namespace Dottik.MemeDownloader;
 
 public class EnvironmentConfig
 {
-    private static bool ffmpegBad = true;
+    private static bool ffmpegBad = false;
     public static async Task<bool> CheckDependencyState()
     {
 #nullable enable

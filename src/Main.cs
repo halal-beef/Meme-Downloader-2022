@@ -10,7 +10,7 @@ public class MainActivity
     /// <summary>
     /// The program's main entry point.
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The program startup arguments!</param>
     public static async Task Main(string[] args)
     {
         if (args is not null && args.Length >= 1) {

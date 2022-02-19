@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using Spectre.Console;
+using System;
+using System.Linq;
 namespace Dottik.MemeDownloader;
 
 public class MainActivity
@@ -13,9 +15,15 @@ public class MainActivity
         {
             switch (ParseArguments(args))
             {
-
+                // Print help & exit
+                case ProgramModes.HELP:
+                    Utils.PrintHelp();
+                    Environment.Exit(0);
+                    break;
+                // Run initial setup & exit
                 case ProgramModes.SETUP:
 
+                    Environment.Exit(0);
                     break;
             }
         }
@@ -25,11 +33,27 @@ public class MainActivity
     {
         for (int i = 0; i < bootArgs.Length; i++)
         {
-            if (bootArgs.Contains("--setup"))
-            {
+            if (bootArgs.Contains("--setup") || bootArgs.Contains("-setup")) {
                 return ProgramModes.SETUP;
+            } else if (bootArgs.Contains("--help") || bootArgs.Contains("-help")) { 
+                return ProgramModes.HELP;
             }
         }
         return ProgramModes.NORMAL;
+    }
+}
+public class Utils
+{
+    public static void PrintHelp()
+    {
+        AnsiConsole.MarkupLine(
+            "||||----------------------||||\n" +
+            "|||| Meme Downloader 2022 ||||\n" +
+            "||||----------------------||||\n" +
+            "\n" +
+            " [green]-setup[/] = Run initial program setup.\n" +
+            "\n" +
+            " [green]-help[/] = Print this message.\n"
+            );
     }
 }

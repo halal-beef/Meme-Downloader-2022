@@ -16,5 +16,9 @@ public enum ProgramModes
     /// <summary>
     /// Testing Mode.
     /// </summary>
-    TESTING
+    TESTING,
+    /// <summary>
+    /// Print Help.
+    /// </summary>
+    HELP
 }

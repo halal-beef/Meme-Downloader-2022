@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 namespace Dottik.MemeDownloader;
 
 public class MainActivity

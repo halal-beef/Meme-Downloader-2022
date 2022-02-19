@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 namespace Dottik.MemeDownloader;
 
 public class MainActivity
@@ -10,7 +11,7 @@ public class MainActivity
     /// The program's main entry point.
     /// </summary>
     /// <param name="args"></param>
-    static async void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         if (args is not null && args.Length >= 1) {
             switch (ParseArguments(args)) {

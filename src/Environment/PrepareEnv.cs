@@ -8,7 +8,7 @@ namespace Dottik.MemeDownloader;
 
 public class EnvironmentConfig
 {
-    private static bool ffmpegBad = false;
+    private static bool ffmpegBad = true;
     public static async Task<bool> CheckDependencyState()
     {
 #nullable enable
@@ -43,22 +43,16 @@ public class EnvironmentConfig
     public static async Task RestoreDependencies() {
         // TODO: Restore Specific package if it's invalid now.
         if (ffmpegBad) {
-            Memory<byte> tmpBuffer = new();
-            string tempDLPath = Path.GetTempPath();
+            string tempDLPath = Path.GetTempFileName();
             FileStream tmpPth = File.OpenWrite(tempDLPath);
             
-            Stream temp = await ProgramData.client.GetStreamAsync("");
+            await ProgramData.client.GetStreamAsync("").Result.CopyToAsync(tmpPth);
                 
-            // Flush, Read and Dispose the stream.
-            await temp.FlushAsync();
-            await temp.ReadAsync(tmpBuffer);
-            await temp.DisposeAsync();
-                
-            // Write to our temporal path, Flush and Dispose!
-            await tmpPth.WriteAsync(tmpBuffer);
+            // Flush and Dispose!
             await tmpPth.FlushAsync();
             await tmpPth.DisposeAsync();
-            tmpBuffer = null;
+            tmpPth.Close();
+            File.Move(tempDLPath, Environment.CurrentDirectory + "\\Dependencies\\ffmpeg.exe", true);
             GC.Collect();
         }
     }

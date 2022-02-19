@@ -1,5 +1,6 @@
 ﻿using Spectre.Console;
 using System;
+using System.IO;
 using System.Linq;
 namespace Dottik.MemeDownloader;
 
@@ -11,8 +12,7 @@ public class MainActivity
     /// <param name="args"></param>
     static void Main(string[] args)
     {
-        if (args is not null && args.Length >= 1)
-        {
+        if (args is not null && args.Length >= 1) {
             switch (ParseArguments(args))
             {
                 // Print help & exit
@@ -22,10 +22,12 @@ public class MainActivity
                     break;
                 // Run initial setup & exit
                 case ProgramModes.SETUP:
-
                     Environment.Exit(0);
                     break;
             }
+        } else if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\") && !ProgramData.versionName.Contains("-pre")) {
+
+            Environment.Exit(0);
         }
     }
 
@@ -37,6 +39,8 @@ public class MainActivity
                 return ProgramModes.SETUP;
             } else if (bootArgs.Contains("--help") || bootArgs.Contains("-help")) { 
                 return ProgramModes.HELP;
+            } else if (bootArgs.Contains("--ci") || bootArgs.Contains("-ci") || bootArgs.Contains("--test") || bootArgs.Contains("-test")) {
+                return ProgramModes.TESTING;
             }
         }
         return ProgramModes.NORMAL;
@@ -53,7 +57,9 @@ public class Utils
             "\r\n" +
             " [green]-setup[/] = Run initial program setup.\r\n" +
             "\r\n" +
-            " [green]-help[/] = Print this message.\r\n"
+            " [green]-help[/] = Print this message.\r\n" +
+            "\r\n" +
+            " [yellow]-ci[/] = Mode to test the program (Used in Continuous Integration)\r\n"
             );
     }
 }

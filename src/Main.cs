@@ -14,15 +14,20 @@ public class MainActivity
     /// The program's main entry point.
     /// </summary>
     /// <param name="args">The program startup arguments!</param>
-    public static async Task Main(string[] args)
-    {
+    public static async Task Main(string[] args) {
+        #region Obligatory Folder Creation.
         string[] foldersToCreate = new string[] {
             $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Dottik\\MD2022\\",
-            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Dottik\\MD2022\\Logs" };
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Dottik\\MD2022\\Logs",
+            $"{Environment.CurrentDirectory}\\Dependencies\\",
+            $"{Environment.CurrentDirectory}\\Temp\\",
+            $"{Environment.CurrentDirectory}\\Downloaded Content\\"};
 
         EnvironmentUtilities.BatchCreateFolders(foldersToCreate);
+        #endregion
+
         Console.Title = "Meme Downloader 2022 - Reddit Post Downloader";
-        await Logger.LOGI($"Meme Downloader 2022 {ProgramData.versionName} ({ProgramData.versionCode}) has been started by {Environment.UserName}\\{Environment.MachineName}");
+        await Logger.LOGI($"Meme Downloader 2022 {ProgramData.versionName} ({ProgramData.versionCode}) has been started | Executed by user {Environment.UserName}\\\\{Environment.MachineName}");
         
         if (args is not null && args.Length >= 1) {
             switch (ParseArguments(args)) {
@@ -37,24 +42,16 @@ public class MainActivity
                     break;
             }
         } 
-        else if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\") && !ProgramData.versionName.Contains("-dev")) {
-            AnsiConsole.MarkupLine($"# {Environment.UserName} - Verifying Dependencies...");
-            bool dependencyStatus = await EnvironmentConfig.CheckDependencyState();
+        else if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\")) {
 
-            if (!dependencyStatus) {
-                AnsiConsole.MarkupLine($"# {Environment.UserName} - One or more dependencies are corrupt! Restoring them...");
-                // If corrupted we need to start our HttpClient!
-                ProgramData.InitializeWebVariables();
-                await EnvironmentConfig.RestoreDependencies();
-                Environment.Exit(0);
-            } else {
-                AnsiConsole.MarkupLine($"# {Environment.UserName} - Dependencies Verified.");
-            }
+            AnsiConsole.MarkupLine("[yellow]Preparing Dependencies[/]...");
+            await EnvironmentConfig.RestoreDependencies();
+            AnsiConsole.MarkupLine("[green]Dependencies Downloaded![/] Proceeding...");
+            File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\");
         }
     }
 
-    static ProgramModes ParseArguments(string[] bootArgs)
-    {
+    static ProgramModes ParseArguments(string[] bootArgs) {
         for (int i = 0; i < bootArgs.Length; i++)
         {
             if (bootArgs.Contains("--setup") || bootArgs.Contains("-setup")) {
@@ -67,8 +64,7 @@ public class MainActivity
         }
         return ProgramModes.NORMAL;
     }
-    private static void PrintHelp()
-    {
+    private static void PrintHelp() {
         AnsiConsole.MarkupLine(
             "||||----------------------||||\r\n" +
             "|||| [red]Meme Downloader 2022[/] ||||\r\n" +

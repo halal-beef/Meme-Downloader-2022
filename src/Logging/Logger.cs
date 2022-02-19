@@ -36,6 +36,8 @@ public class Logger
         string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} E: {message}";
         await WriteLog(message);
     }
+
+
     private static async Task WriteLog(string msg)
     {
         string targetFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\Logs\\",
@@ -43,6 +45,6 @@ public class Logger
         if (!File.Exists(targetFolder + logFileName)) {
             File.CreateText(targetFolder + logFileName);
         }
-        await File.AppendAllTextAsync(targetFolder + logFileName, msg);
+        await File.AppendAllTextAsync(targetFolder + logFileName, msg + "\r\n");
     }
 }

@@ -43,7 +43,7 @@ public class Logger
         string targetFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\Logs\\",
             logFileName = $"{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log";
         if (!File.Exists(targetFolder + logFileName)) {
-            File.CreateText(targetFolder + logFileName);
+            await File.CreateText(targetFolder + logFileName).DisposeAsync();
         }
         await File.AppendAllTextAsync(targetFolder + logFileName, msg + "\r\n");
     }

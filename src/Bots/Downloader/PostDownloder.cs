@@ -15,8 +15,5 @@ public class PostDownloder
     /// </summary>
     /// <param name="subreddit">the subreddit to download from ONLY the name, not "/r/{subreddit}", but without '/r/'</param>
     /// <returns>Raw JSON containing data from a random reddit post from that subreddit.</returns>
-    public static async Task<string> GetRandomPostJson(string subreddit)
-    {
-        return await ProgramData.client.GetStringAsync($"http://reddit.com/r/{subreddit}/random.json");
-    }
+    public static async Task<string> GetRandomPostJson(string subreddit) => await ProgramData.client.GetStringAsync($"http://reddit.com/r/{subreddit}/random.json");
 }

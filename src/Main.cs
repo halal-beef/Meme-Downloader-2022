@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dottik.MemeDownloader.Logging;
 using Dottik.MemeDownloader.Utilities;
+using Dottik.MemeDownloader.Bots;
 
 namespace Dottik.MemeDownloader;
 
@@ -28,7 +29,6 @@ public class MainActivity
 
         Console.Title = "Meme Downloader 2022 - Reddit Post Downloader";
         await Logger.LOGI($"Meme Downloader 2022 {ProgramData.versionName} ({ProgramData.versionCode}) has been started | Executed by user {Environment.UserName}\\\\{Environment.MachineName}");
-        
         if (args is not null && args.Length >= 1) {
             switch (ParseArguments(args)) {
                 // Print help & exit
@@ -47,7 +47,7 @@ public class MainActivity
             AnsiConsole.MarkupLine("[yellow]Preparing Dependencies[/]...");
             await EnvironmentConfig.RestoreDependencies();
             AnsiConsole.MarkupLine("[green]Dependencies Downloaded![/] Proceeding...");
-            File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\");
+            File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup");
         }
     }
 

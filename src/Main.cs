@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Dottik.MemeDownloader.Logging;
 using Dottik.MemeDownloader.Utilities;
 using Dottik.MemeDownloader.Bots;
+using Newtonsoft.Json;
+using System.Text;
+using System.Threading;
 
 namespace Dottik.MemeDownloader;
 
@@ -27,10 +30,14 @@ public class MainActivity
         EnvironmentUtilities.BatchCreateFolders(foldersToCreate);
         #endregion
 
+        bool setupMode = false;
+
         Console.Title = "Meme Downloader 2022 - Reddit Post Downloader";
         await Logger.LOGI($"Meme Downloader 2022 {ProgramData.versionName} ({ProgramData.versionCode}) has been started | Executed by user {Environment.UserName}\\\\{Environment.MachineName}");
         if (args is not null && args.Length >= 1) {
             switch (ParseArguments(args)) {
+                case ProgramModes.NORMAL:
+                    goto NORMALEXEC;
                 // Print help & exit
                 case ProgramModes.HELP:
                     PrintHelp();
@@ -38,17 +45,66 @@ public class MainActivity
                     break;
                 // Run initial setup & exit
                 case ProgramModes.SETUP:
-                    Environment.Exit(0);
+                    setupMode = true;
                     break;
             }
-        } 
-        else if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\")) {
-
+        }
+        if (setupMode || !File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\")) {
+            
             AnsiConsole.MarkupLine("[yellow]Preparing Dependencies[/]...");
             await EnvironmentConfig.RestoreDependencies();
-            AnsiConsole.MarkupLine("[green]Dependencies Downloaded![/] Proceeding...");
+            if (!setupMode)
+                AnsiConsole.MarkupLine("[green]Dependencies Downloaded![/] Proceeding...");
+
             File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup");
+            if (setupMode) {
+                string jsonBase = JsonConvert.SerializeObject(new JSONData());
+                File.WriteAllText(Environment.CurrentDirectory + "\\Configurations.json", jsonBase);
+    AnsiConsole.MarkupLine("[green bold]Setup complete![/]");
+                Environment.Exit(0);
+            }
         }
+
+#nullable enable
+
+    NORMALEXEC:
+        BotMain botMainInstance = new();
+        AnsiConsole.MarkupLine("Starting Meme Downloader 2022...");
+        JSONData progData = new();
+
+        if (File.Exists(Environment.CurrentDirectory + "\\Configurations.json")) {
+            progData = await ReadConfigurations();
+        } else {
+            AnsiConsole.MarkupLine($"run \'{Environment.ProcessPath} -setup\'");
+        }
+        StringBuilder? subreddits = new();
+        for (int i = 0; i < progData.targetSubReddits.Length; i++)
+        {
+            if (i == progData.targetSubReddits.Length) { 
+                subreddits.Append(progData.targetSubReddits[i]);
+                break;
+            }
+
+            if (progData.targetSubReddits[i - 1] != progData.targetSubReddits[i])
+                subreddits.Append(progData.targetSubReddits[i] + ", ");
+        }
+
+        string? threadAmount = "";
+        if (progData.multiThreaded == true)
+            threadAmount = $" - Thread Amount: {progData.threads}";
+
+        AnsiConsole.MarkupLine(
+            $" - Program Settings:\r\n" +
+            $" - Multi-Threading: {progData.multiThreaded}\r\n" +
+            $" - Target Subreddits: {subreddits}\r\n" +
+            $" - Allow NSFW: {progData.allowNSFW}\r\n" +
+            $"{threadAmount}");
+        threadAmount = null;
+        subreddits = null;
+#nullable restore
+        BotMain.Instance = botMainInstance;
+        ProgramData.InitializeWebVariables();
+        await botMainInstance.StartBots(progData.multiThreaded, progData.threads);
     }
 
     static ProgramModes ParseArguments(string[] bootArgs) {
@@ -77,4 +133,5 @@ public class MainActivity
             " [yellow]-ci[/] = Mode to test the program (Used in Continuous Integration)\r\n"
             );
     }
+    private static async Task<JSONData> ReadConfigurations() => JsonConvert.DeserializeObject<JSONData>(await File.ReadAllTextAsync(Environment.CurrentDirectory + "\\Configurations.json"));
 }

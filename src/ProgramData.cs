@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace Dottik.MemeDownloader;
 
@@ -35,5 +36,40 @@ public struct ProgramData
     /// </summary>
     public ProgramData() {
 
+    }
+}
+
+public struct JSONData {
+    /// <summary>
+    /// Should the program run in more than one thread?
+    /// </summary>
+    [JsonProperty("MultiThreaded")]
+    public bool multiThreaded = true;
+    /// <summary>
+    /// The array of the target subreddits.
+    /// </summary>
+    [JsonProperty("Target Sub Reddits")]
+    public string[] targetSubReddits;
+    /// <summary>
+    /// Should the program download NSFW?
+    /// </summary>
+    [JsonProperty("Allow NSFW")]
+    public bool allowNSFW = false;
+    /// <summary>
+    /// The amount of threads that should be used, IGNORED IF multiThreaded is false
+    /// </summary>
+    [JsonProperty("Thread Count")]
+    public byte threads;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="allowNSFW">Should the program download posts categorized as NSFW? if <see langword="true"/> it will download them.</param>
+    /// <param name="multiThreaded">Should the program run in a multi threaded way? if <see langword="true"/> it will run with the amount of Threads specified</param>
+    /// <param name="targetSubReddits"></param>
+    public JSONData(bool allowNSFW, bool multiThreaded, string[] targetSubReddits, byte threads) {
+        this.allowNSFW = allowNSFW;
+        this.multiThreaded = multiThreaded;
+        this.targetSubReddits = targetSubReddits;
+        this.threads = threads;
     }
 }

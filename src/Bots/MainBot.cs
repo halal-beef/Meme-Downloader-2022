@@ -17,15 +17,14 @@ public class BotMain
     public async Task StartBots(bool multiThreading, int? _threadAmount = 1) {
         BotEvents.BotCreationArgs _args = new();
         AnsiConsole.MarkupLine("Starting Bots...");
-        
-        
+
+        BotConfigurations.multiThreaded = multiThreading;
+
         if (_threadAmount == 1 && multiThreading)
             _threadAmount = Environment.ProcessorCount;
-        else if (multiThreading) {
-            BotConfigurations.multiThreaded = multiThreading;
-        }
-        else
+        else if (multiThreading) 
             _threadAmount = 1;
+
         // Declare an event
 
         BotEvents.OnBotCreate += TriggerWhenBotCreated;

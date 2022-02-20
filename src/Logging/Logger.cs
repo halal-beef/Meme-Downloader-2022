@@ -13,27 +13,30 @@ public class Logger
     /// Log INFO to the log file.
     /// </summary>
     /// <param name="message">The message to log.</param>
-    public static async Task LOGI(string message)
+    /// <param name="sender">From where does this message come from</param>
+    public static async Task LOGI(string message, string sender)
     {
-        string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} I: {message}";
+        string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/{sender}] {currentPID} I: {message}";
         await WriteLog(trueMessage);
     }
     /// <summary>
     /// Log WARN to the log file.
     /// </summary>
     /// <param name="message">The message to log.</param>
-    public static async Task LOGW(string message)
+    /// <param name="sender">From where does this message come from</param>
+    public static async Task LOGW(string message, string sender)
     {
-        string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} W: {message}";
+        string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/{sender}] {currentPID} W: {message}";
         await WriteLog(trueMessage);
     }
     /// <summary>
     /// Log ERROR to the log file.
     /// </summary>
     /// <param name="message">The message to log.</param>
-    public static async Task LOGE(string message)
+    /// <param name="sender">From where does this message come from</param>
+    public static async Task LOGE(string message, string sender)
     {
-        string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} E: {message}";
+        string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/{sender}] {currentPID} E: {message}";
         await WriteLog(trueMessage);
     }
 

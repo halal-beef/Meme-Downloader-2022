@@ -33,7 +33,7 @@ public class MainActivity
         bool setupMode = false;
 
         Console.Title = "Meme Downloader 2022 - Reddit Post Downloader";
-        await Logger.LOGI($"Meme Downloader 2022 {ProgramData.versionName} ({ProgramData.versionCode}) has been started | Executed by user {Environment.UserName}\\\\{Environment.MachineName}");
+        await Logger.LOGI($"Meme Downloader 2022 {ProgramData.versionName} ({ProgramData.versionCode}) has been started | Executed by user {Environment.UserName}\\\\{Environment.MachineName}", "Main");
         if (args is not null && args.Length >= 1) {
             switch (ParseArguments(args)) {
                 case ProgramModes.NORMAL:

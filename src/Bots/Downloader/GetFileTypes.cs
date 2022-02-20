@@ -25,7 +25,7 @@ public class MainDownloader
         string contentUrl = Result["url"].ToString();
 
         if (contentUrl.Contains("png") || contentUrl.Contains("jpg") || contentUrl.Contains("jpeg") || contentUrl.Contains("webp")) {
-            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image!");
+            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image!", "Downloader");
             if (contentUrl.Contains("png")) {
                 fileInfo.FileExtension = ".png";
             }
@@ -40,7 +40,7 @@ public class MainDownloader
             }
                 
         } else if (contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv")) {
-            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Video!");
+            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Video!", "Downloader");
             fileInfo.FileTypes = FileTypes.Video;
 
             if (contentUrl.Contains("mp4")) {
@@ -51,13 +51,13 @@ public class MainDownloader
                 fileInfo.FileExtension = ".mkv";
             }
         } else if (contentUrl.Contains("gallery")) {
-            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image Gallery!");
+            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image Gallery!", "Downloader");
             fileInfo.isGallery = true;
         } else if (contentUrl.Contains("gif")) {
-            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Gif!");
+            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Gif!", "Downloader");
             fileInfo.FileExtension = ".gif";
         } else {
-            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an unknown media type...");
+            await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an unknown media type...", "Downloader");
             fileInfo.FileTypes = FileTypes.Unknown;
             fileInfo.FileExtension = ".htm";
         }

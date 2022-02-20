@@ -9,6 +9,7 @@ using Dottik.MemeDownloader.Logging;
 using Dottik.MemeDownloader.Utilities;
 using Spectre.Console;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Dottik.MemeDownloader.Bots;
 public class BotMain
@@ -44,15 +45,30 @@ public class BotMain
         await BotRestarter();
     }
     public async Task BotLogic(int listIdentifier) {
+        try
+        {
+            string _rand_postJson = await PostDownloder.GetRandomPostJson("shitposting");
 
-        string _rand_postJson = await PostDownloder.GetRandomPostJson("shitposting");
+            JObject _result = JObject.Parse(
+                    JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"].ToString()
+                );
+            // TODO: Download Posts, images and videos.
+            FileInformation dlInfo = await MainDownloader.GetFileType(_rand_postJson);
+            
+            if (dlInfo.isGallery) {
 
-        JObject _result = JObject.Parse(
-                JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"].ToString()
-            );
-        // TODO: Download Posts, images and videos.
-        BotConfigurations.bots[listIdentifier] = false;
+            }
 
+        } catch (Exception ex) {
+            BotConfigurations.bots[listIdentifier] = false;
+            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} [gray]-[/] [red]Has suffered an exception. Logging to log file![/]");
+            await Logger.LOGE(
+                $"An Exception occured! Stack Trace:\r\n" +
+                $"--------BEGIN STACK TRACE\r\n" +
+                $"{JsonConvert.SerializeObject(ex.ToString(), Formatting.Indented)}\r\n" +
+                $"--------END STACK TRACE", 
+                "BotLogic");
+        }
     }
     public async Task BotRestarter()
     {
@@ -67,7 +83,7 @@ public class BotMain
             {
                 i = BotConfigurations.bots.FindIndex(i, quickDetect);
                 
-                // Create bots.
+                // Re-Run bots.
                 _args.BotName = $"Bot {i}";
                 Thread newBot = new(async () => await BotLogic(i));
                 newBot.Name = _args.BotName;
@@ -83,7 +99,7 @@ public class BotMain
 #nullable disable
     public static async void TriggerWhenBotCreated(object sender, BotEvents.BotCreationArgs arguments)
     {
-        await Logger.LOGI($"Class of type \'{sender.GetType()}\' has started a new bot with name \'{arguments.BotName}\'");
+        await Logger.LOGI($"Class of type \'{sender.GetType()}\' has started a new bot with name \'{arguments.BotName}\'", "BotLogic -> BotEvents.OnCreate");
     }
 #nullable restore
 }

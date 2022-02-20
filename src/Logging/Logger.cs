@@ -16,7 +16,7 @@ public class Logger
     public static async Task LOGI(string message)
     {
         string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} I: {message}";
-        await WriteLog(message);
+        await WriteLog(trueMessage);
     }
     /// <summary>
     /// Log WARN to the log file.
@@ -25,7 +25,7 @@ public class Logger
     public static async Task LOGW(string message)
     {
         string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} W: {message}";
-        await WriteLog(message);
+        await WriteLog(trueMessage);
     }
     /// <summary>
     /// Log ERROR to the log file.
@@ -34,7 +34,7 @@ public class Logger
     public static async Task LOGE(string message)
     {
         string trueMessage = $"{DateTime.Now.TimeOfDay.ToString().Split('.')[0]} - [{Thread.CurrentThread.Name}/Logger] {currentPID} E: {message}";
-        await WriteLog(message);
+        await WriteLog(trueMessage);
     }
 
 

@@ -12,21 +12,25 @@ using System.Linq;
 using Dottik.MemeDownloader.Logging;
 
 namespace Dottik.MemeDownloader.Downloader;
+
 public struct FormattedLinks
 {
     /// <summary>
     /// The Links in order 0 -> 1 -> 2 -> 3 -> 4...
     /// </summary>
     public List<string> Links = new();
+
     /// <summary>
     /// The Extensions of the media to downloaded in order to the links.
     /// </summary>
     public List<string> Extensions = new();
-    public FormattedLinks() {
 
+    public FormattedLinks()
+    {
     }
 }
-public class GetRedditGallery
+
+public static class GetRedditGallery
 {
     /// <summary>
     /// Give in the string of the JSON and it lets out the links and extensions to each image in the Reddit Gallery!
@@ -60,15 +64,18 @@ public class GetRedditGallery
                 string extmp = extensionTemp.ToString();
                 string exfinal = "";
                 // Get Extension.
-                if (extmp.Contains("jpg")) {
+                if (extmp.Contains("jpg"))
+                {
                     _galleryData.Extensions.Add(".jpg");
                     exfinal = ".jpg";
                 }
-                else if (extmp.Contains("png")) {
+                else if (extmp.Contains("png"))
+                {
                     _galleryData.Extensions.Add(".png");
                     exfinal = ".png";
                 }
-                else if (extmp.Contains("jpeg")) {
+                else if (extmp.Contains("jpeg"))
+                {
                     _galleryData.Extensions.Add(".jpeg");
                     exfinal = ".jpeg";
                 }
@@ -82,32 +89,40 @@ public class GetRedditGallery
         }
         return _galleryData;
     }
+
     public static async Task GetGallery(string PathToResult, string sourceLink, FormattedLinks _formattedLinkData)
     {
         if (_formattedLinkData.Links.Count > 0 && _formattedLinkData.Extensions.Count > 0)
         {
             for (int i = 0; i < _formattedLinkData.Links.Count; i++)
             {
-                if (!File.Exists(PathToResult + $"_GALLERY_IMAGE_{i}{_formattedLinkData.Extensions[i]}")) {
+                if (!File.Exists(PathToResult + $"_GALLERY_IMAGE_{i}{_formattedLinkData.Extensions[i]}"))
+                {
                     using FileStream fs0 = File.Create(PathToResult + $"_GALLERY_IMAGE_{i}{_formattedLinkData.Extensions[i]}");
 
-                    await ProgramData.client.GetStreamAsync(_formattedLinkData.Links[i]).Result.CopyToAsync(fs0);
+                    await ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]).Result.CopyToAsync(fs0);
 
                     await fs0.FlushAsync();
                     await fs0.DisposeAsync();
                     fs0.Close();
-                } else {
+                }
+                else
+                {
                     AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has downloaded an already existing gallery.");
                 }
             }
             AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Downloaded a Gallery from {sourceLink.RemoveMarkup()}");
-        } else
+        }
+        else
         {
             await Logger.LOGE("Failed to get gallery! Invalid Gallery Data was presented.", "Downloader -> Gallery");
             throw new Exception("Invalid Gallery Data.");
         }
     }
+
     private static JObject GetMediaExtension(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["media_metadata"].ToString());
+
     private static JObject GetMediaIds(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["gallery_data"].ToString());
+
     private static int GetJTokenChildrenLength(JObject token) => token.Children().ToArray().Length;
 }

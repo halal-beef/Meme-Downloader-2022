@@ -9,14 +9,17 @@ public enum ProgramModes
     /// Initial setup.
     /// </summary>
     SETUP,
+
     /// <summary>
     /// Normal Opration.
     /// </summary>
     NORMAL,
+
     /// <summary>
     /// Testing Mode.
     /// </summary>
     TESTING,
+
     /// <summary>
     /// Print Help.
     /// </summary>

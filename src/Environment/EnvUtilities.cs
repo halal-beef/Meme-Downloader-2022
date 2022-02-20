@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Dottik.MemeDownloader.Utilities;
 
-public class EnvironmentUtilities
+public static class EnvironmentUtilities
 {
     /// <summary>
     /// Creates a batch of folders from a Array of strings.
@@ -17,6 +17,7 @@ public class EnvironmentUtilities
                 Directory.CreateDirectory(folderPaths[i]);
         }
     }
+
     /// <summary>
     /// Creates a batch of folders from a List of strings.
     /// </summary>

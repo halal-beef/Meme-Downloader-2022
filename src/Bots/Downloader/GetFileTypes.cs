@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Dottik.MemeDownloader.Logging;
+using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dottik.MemeDownloader.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Dottik.MemeDownloader.Downloader;
-public class MainDownloader
+
+public static class MainDownloader
 {
     /// <summary>
     /// Analyze the whole requestJson string and return the file type identified + it's extension.
     /// </summary>
     /// <param name="requestJson"></param>
     /// <returns></returns>
-    public static async Task<FileInformation> GetFileType(string requestJson) {
+    public static async Task<FileInformation> GetFileType(string requestJson)
+    {
         FileInformation fileInfo = new();
 
         JObject Result = JObject.Parse(
@@ -24,39 +21,56 @@ public class MainDownloader
         );
         string contentUrl = Result["url"].ToString();
 
-        if (contentUrl.Contains("png") || contentUrl.Contains("jpg") || contentUrl.Contains("jpeg") || contentUrl.Contains("webp")) {
+        if (contentUrl.Contains("png") || contentUrl.Contains("jpg") || contentUrl.Contains("jpeg") || contentUrl.Contains("webp"))
+        {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image!", "Downloader");
-            if (contentUrl.Contains("png")) {
+            if (contentUrl.Contains("png"))
+            {
                 fileInfo.FileExtension = ".png";
             }
-            else if (contentUrl.Contains("jpg")) {
+            else if (contentUrl.Contains("jpg"))
+            {
                 fileInfo.FileExtension = ".jpg";
             }
-            else if (contentUrl.Contains("jpeg")) {
+            else if (contentUrl.Contains("jpeg"))
+            {
                 fileInfo.FileExtension = ".jpeg";
             }
-            else { 
-                fileInfo.FileExtension = ".webp"; 
+            else
+            {
+                fileInfo.FileExtension = ".webp";
             }
-                
-        } else if (contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv")) {
+        }
+        else if (contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv"))
+        {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Video!", "Downloader");
             fileInfo.FileTypes = FileTypes.Video;
 
-            if (contentUrl.Contains("mp4")) {
+            if (contentUrl.Contains("mp4"))
+            {
                 fileInfo.FileExtension = ".mp4";
-            } else if (contentUrl.Contains("mov")) {
+            }
+            else if (contentUrl.Contains("mov"))
+            {
                 fileInfo.FileExtension = ".mov";
-            } else {
+            }
+            else
+            {
                 fileInfo.FileExtension = ".mkv";
             }
-        } else if (contentUrl.Contains("gallery")) {
+        }
+        else if (contentUrl.Contains("gallery"))
+        {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image Gallery!", "Downloader");
             fileInfo.isGallery = true;
-        } else if (contentUrl.Contains("gif")) {
+        }
+        else if (contentUrl.Contains("gif"))
+        {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Gif!", "Downloader");
             fileInfo.FileExtension = ".gif";
-        } else {
+        }
+        else
+        {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an unknown media type...", "Downloader");
             fileInfo.FileTypes = FileTypes.Unknown;
             fileInfo.FileExtension = ".htm";

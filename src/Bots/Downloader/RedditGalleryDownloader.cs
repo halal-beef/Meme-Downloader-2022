@@ -11,7 +11,7 @@ using Spectre.Console;
 using System.Linq;
 using Dottik.MemeDownloader.Logging;
 
-namespace Dottik.MemeDownloader;
+namespace Dottik.MemeDownloader.Downloader;
 public struct FormattedLinks
 {
     /// <summary>

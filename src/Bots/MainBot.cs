@@ -16,16 +16,16 @@ public class BotMain
     public static readonly string DownloadPath = Environment.CurrentDirectory + "\\Downloaded Content\\";
     public static BotMain Instance;
 
-    public async Task StartBots(bool multiThreading, int _threadAmount = 1)
+    public async Task StartBots(bool multiThreading, int _threadAmount = -1)
     {
         BotEvents.BotCreationArgs _args = new();
         AnsiConsole.MarkupLine("Starting Bots...");
 
         BotConfigurations.multiThreaded = multiThreading;
 
-        if (_threadAmount == 1 && multiThreading)
+        if (_threadAmount == -1 && multiThreading)
             _threadAmount = Environment.ProcessorCount;
-        else if (multiThreading)
+        else if (!multiThreading)
             _threadAmount = 1;
 
         // Declare an event
@@ -57,14 +57,22 @@ public class BotMain
             {
                 for (int iterator = 0; iterator < BotConfigurations.targetSubreddits?.Length; iterator++)
                 {
+                    #region Get JSON
                     string _rand_postJson = await PostDownloder.GetRandomPostJson("shitposting");
+                    #endregion
 
+                    #region Get Post Address
                     JObject _result = JObject.Parse(
-                            JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"].ToString()
+                            (string)JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"]
                         );
-                    // TODO: Download Posts, images and videos.
+                    #endregion
+
+                    // TODO: Download Posts, Galleries (DONE), images and videos.
                     FileInformation dlInfo = await MainDownloader.GetFileType(_rand_postJson);
 
+
+
+                    #region Check if Gallery and Download.
                     if (dlInfo.isGallery)
                     {
                         FormattedLinks galleryData = await GetRedditGallery.FormatLinks(_rand_postJson);
@@ -75,6 +83,15 @@ public class BotMain
                             FileStream newFile = File.Create(DownloadPath);
                             streams?[i].CopyToAsync(newFile);
                         }
+                    }
+                    #endregion
+                    if (dlInfo.FileTypes == FileTypes.Image)
+                    {
+                        FileStream fs = File.Create(DownloadPath + $"\\{BotConfigurations.targetSubreddits[iterator]}\\{dlInfo.FileName}");
+                        await ProgramData.Client.GetStreamAsync(dlInfo.DownloadURL).Result.CopyToAsync(fs);
+                        await fs.FlushAsync();
+                        await fs.DisposeAsync();
+                        fs.Close();
                     }
                 }
             }

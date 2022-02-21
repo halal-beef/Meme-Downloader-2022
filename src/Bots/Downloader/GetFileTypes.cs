@@ -1,5 +1,7 @@
 ﻿using Dottik.MemeDownloader.Logging;
 using Newtonsoft.Json.Linq;
+using System.Linq;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,47 +21,23 @@ public static class MainDownloader
         JObject Result = JObject.Parse(
             JArray.Parse(requestJson)[0]["data"]["children"][0]["data"].ToString()
         );
-        string contentUrl = Result["url"].ToString();
+        string contentUrl = (string)Result["url"];
+        string contentDomain = (string)Result["domain"];
+        fileInfo.isNSFW = (bool)Result["over_18"];
+        fileInfo.PostTitle = Result["title"].ToString().Trim(Path.GetInvalidFileNameChars()).Trim(new char[] { '\"', '\'' });
 
-        if (contentUrl.Contains("png") || contentUrl.Contains("jpg") || contentUrl.Contains("jpeg") || contentUrl.Contains("webp"))
-        {
+        if (contentDomain == "i.redd.it") {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image!", "Downloader");
-            if (contentUrl.Contains("png"))
-            {
-                fileInfo.FileExtension = ".png";
-            }
-            else if (contentUrl.Contains("jpg"))
-            {
-                fileInfo.FileExtension = ".jpg";
-            }
-            else if (contentUrl.Contains("jpeg"))
-            {
-                fileInfo.FileExtension = ".jpeg";
-            }
-            else
-            {
-                fileInfo.FileExtension = ".webp";
-            }
+            fileInfo.FileExtension = "." + contentUrl.Split('.').Last();
+            fileInfo.DownloadURL = (string)Result["url_overridden_by_dest"];
         }
-        else if (contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv"))
+        else if ((bool)Result["is_video"] || contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv"))
         {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Video!", "Downloader");
             fileInfo.FileTypes = FileTypes.Video;
-
-            if (contentUrl.Contains("mp4"))
-            {
-                fileInfo.FileExtension = ".mp4";
-            }
-            else if (contentUrl.Contains("mov"))
-            {
-                fileInfo.FileExtension = ".mov";
-            }
-            else
-            {
-                fileInfo.FileExtension = ".mkv";
-            }
+            fileInfo.FileExtension = "." + contentUrl.Split('.').Last();
         }
-        else if (contentUrl.Contains("gallery"))
+        else if (contentUrl.Contains("gallery") && contentDomain == "reddit.com")
         {
             await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image Gallery!", "Downloader");
             fileInfo.isGallery = true;
@@ -75,6 +53,7 @@ public static class MainDownloader
             fileInfo.FileTypes = FileTypes.Unknown;
             fileInfo.FileExtension = ".htm";
         }
+        fileInfo.FileName = fileInfo.PostTitle + fileInfo.FileExtension;
         return fileInfo;
     }
 }

@@ -25,14 +25,20 @@ public enum FileTypes
 
 public struct FileInformation
 {
+    public string PostTitle { get; set; }
+    public string DownloadURL { get; set; }
     public bool isGallery { get; set; }
+    public bool isNSFW { get; set; }
     public string FileExtension { get; set; }
     public string FileName { get; set; }
     public FileTypes FileTypes { get; set; }
 
-    public FileInformation(bool isGallery, string FileExtension, string FileName, FileTypes FileTypes)
+    public FileInformation(string PostTitle, string DownloadURL, bool isGallery, bool isNSFW, string FileExtension, string FileName, FileTypes FileTypes)
     {
+        this.PostTitle = PostTitle;
+        this.DownloadURL = DownloadURL;
         this.isGallery = isGallery;
+        this.isNSFW = isNSFW;
         this.FileExtension = FileExtension;
         this.FileName = FileName;
         this.FileTypes = FileTypes;

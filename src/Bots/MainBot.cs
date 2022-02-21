@@ -120,7 +120,7 @@ public class BotMain
     public static async void TriggerWhenBotCrash(object sender, BotEvents.BotCrashArgs arguments)
     {
         await Logger.LOGE(
-            "An Exception occured! Stack Trace:\r\n" +
+            $"An Exception occured in \'{sender?.GetType()}\'! Stack Trace:\r\n" +
             "--------BEGIN STACK TRACE\r\n" +
             $"{JsonConvert.SerializeObject(arguments.exception?.ToString(), Formatting.Indented)}\r\n" +
             "--------END STACK TRACE",

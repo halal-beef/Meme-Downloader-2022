@@ -10,7 +10,12 @@ public struct ProgramData
 
     public static CookieContainer container = new();
 
-    private readonly static HttpClientHandler httpHandler = new()
+    public static int versionCode = 01;
+
+    // Used just for logs and maybe other stuff
+    public static string versionName = "v0.0.1-dev";
+
+    private static readonly HttpClientHandler httpHandler = new()
     {
         SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
         AutomaticDecompression = DecompressionMethods.All,
@@ -18,8 +23,7 @@ public struct ProgramData
         UseCookies = true
     };
 
-    public static int versionCode = 01; // Used just for logs and maybe other stuff
-    public static string versionName = "v0.0.1-dev"; // Used just for logs and maybe other stuff.
+    // Used just for logs and maybe other stuff.
     public static HttpClient Client { get; private set; }
 
     /// <summary>
@@ -51,6 +55,12 @@ public struct ProgramData
 public struct JSONData
 {
     /// <summary>
+    /// Should the program download NSFW?
+    /// </summary>
+    [JsonProperty("Allow NSFW")]
+    public bool allowNSFW = false;
+
+    /// <summary>
     /// Should the program run in more than one thread?
     /// </summary>
     [JsonProperty("MultiThreaded")]
@@ -61,12 +71,6 @@ public struct JSONData
     /// </summary>
     [JsonProperty("Target Sub Reddits")]
     public string[] targetSubReddits;
-
-    /// <summary>
-    /// Should the program download NSFW?
-    /// </summary>
-    [JsonProperty("Allow NSFW")]
-    public bool allowNSFW = false;
 
     /// <summary>
     /// The amount of threads that should be used, IGNORED IF multiThreaded is false

@@ -1,29 +1,26 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+﻿using Dottik.MemeDownloader.Logging;
 using Newtonsoft.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Net.Http;
-using Spectre.Console;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Dottik.MemeDownloader.Logging;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Dottik.MemeDownloader.Downloader;
 
 public struct FormattedLinks
 {
     /// <summary>
-    /// The Links in order 0 -> 1 -> 2 -> 3 -> 4...
-    /// </summary>
-    public List<string> Links = new();
-
-    /// <summary>
     /// The Extensions of the media to downloaded in order to the links.
     /// </summary>
     public List<string> Extensions = new();
+
+    /// <summary>
+    /// The Links in order 0 -> 1 -> 2 -> 3 -> 4...
+    /// </summary>
+    public List<string> Links = new();
 
     public FormattedLinks()
     {
@@ -89,6 +86,7 @@ public static class GetRedditGallery
         }
         return _galleryData;
     }
+
     /// <summary>
     /// Download images as a List of Streams.
     /// </summary>
@@ -104,16 +102,18 @@ public static class GetRedditGallery
             {
                 data.Add(await ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]));
             }
-        } else {
+        }
+        else
+        {
             await Logger.LOGE("Failed to get gallery! Invalid Gallery Data was presented.", "Downloader -> Gallery");
             throw new Exception("Download Error -> Invalid Gallery Data.");
         }
         return data;
     }
 
+    private static int GetJTokenChildrenLength(JObject token) => token.Children().ToArray().Length;
+
     private static JObject GetMediaExtension(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["media_metadata"].ToString());
 
     private static JObject GetMediaIds(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["gallery_data"].ToString());
-
-    private static int GetJTokenChildrenLength(JObject token) => token.Children().ToArray().Length;
 }

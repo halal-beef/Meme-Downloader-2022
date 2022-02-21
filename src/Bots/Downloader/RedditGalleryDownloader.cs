@@ -89,35 +89,26 @@ public static class GetRedditGallery
         }
         return _galleryData;
     }
-
-    public static async Task GetGallery(string PathToResult, string sourceLink, FormattedLinks _formattedLinkData)
+    /// <summary>
+    /// Download images as a List of Streams.
+    /// </summary>
+    /// <param name="_formattedLinkData"></param>
+    /// <exception cref="Exception">Thrown if the Gallery data is invalid.</exception>
+    /// <returns>A List of streams containing the data of images.</returns>
+    public static async Task<List<Stream>> GetGallery(FormattedLinks _formattedLinkData)
     {
+        List<Stream> data = new();
         if (_formattedLinkData.Links.Count > 0 && _formattedLinkData.Extensions.Count > 0)
         {
             for (int i = 0; i < _formattedLinkData.Links.Count; i++)
             {
-                if (!File.Exists(PathToResult + $"_GALLERY_IMAGE_{i}{_formattedLinkData.Extensions[i]}"))
-                {
-                    using FileStream fs0 = File.Create(PathToResult + $"_GALLERY_IMAGE_{i}{_formattedLinkData.Extensions[i]}");
-
-                    await ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]).Result.CopyToAsync(fs0);
-
-                    await fs0.FlushAsync();
-                    await fs0.DisposeAsync();
-                    fs0.Close();
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has downloaded an already existing gallery.");
-                }
+                data.Add(await ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]));
             }
-            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Downloaded a Gallery from {sourceLink.RemoveMarkup()}");
-        }
-        else
-        {
+        } else {
             await Logger.LOGE("Failed to get gallery! Invalid Gallery Data was presented.", "Downloader -> Gallery");
-            throw new Exception("Invalid Gallery Data.");
+            throw new Exception("Download Error -> Invalid Gallery Data.");
         }
+        return data;
     }
 
     private static JObject GetMediaExtension(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["media_metadata"].ToString());

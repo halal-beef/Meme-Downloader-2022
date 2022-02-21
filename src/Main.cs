@@ -86,7 +86,7 @@ public static class MainActivity
             AnsiConsole.MarkupLine($"run \'{Environment.ProcessPath} -setup\'");
         }
         StringBuilder? subreddits = new();
-        for (int i = 0; i < progData.targetSubReddits.Length; i++)
+        for (int i = 0; i < progData.targetSubReddits?.Length; i++)
         {
             if (i == progData.targetSubReddits.Length)
             {

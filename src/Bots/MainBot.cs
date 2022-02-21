@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Spectre.Console;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +13,10 @@ namespace Dottik.MemeDownloader.Bots;
 
 public class BotMain
 {
+    public static readonly string DownloadPath = Environment.CurrentDirectory + "\\Downloaded Content\\";
     public static BotMain Instance;
 
-    public async Task StartBots(bool multiThreading, int? _threadAmount = 1)
+    public async Task StartBots(bool multiThreading, int _threadAmount = 1)
     {
         BotEvents.BotCreationArgs _args = new();
         AnsiConsole.MarkupLine("Starting Bots...");
@@ -29,6 +31,7 @@ public class BotMain
         // Declare an event
 
         BotEvents.OnBotCreate += TriggerWhenBotCreated;
+        BotEvents.OnBotCrash += TriggerWhenBotCrash;
 
         // TODO: Actually start the bots. | Done, well, Sort of.
         for (int i = 0; i < _threadAmount; i++)
@@ -41,37 +44,45 @@ public class BotMain
             BotEvents.OnBotCreate?.Invoke(this, _args);
         }
         BotConfigurations.threadAmount = _threadAmount;
-        _threadAmount = null;
         await Task.Delay(15000);
         await BotRestarter();
     }
 
     public async Task BotLogic(int listIdentifier)
     {
+        BotEvents.BotCrashArgs crashArgs = new();
         try
         {
-            string _rand_postJson = await PostDownloder.GetRandomPostJson("shitposting");
-
-            JObject _result = JObject.Parse(
-                    JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"].ToString()
-                );
-            // TODO: Download Posts, images and videos.
-            FileInformation dlInfo = await MainDownloader.GetFileType(_rand_postJson);
-
-            if (dlInfo.isGallery)
+            while (true)
             {
+                for (int iterator = 0; iterator < BotConfigurations.targetSubreddits?.Length; iterator++)
+                {
+                    string _rand_postJson = await PostDownloder.GetRandomPostJson("shitposting");
+
+                    JObject _result = JObject.Parse(
+                            JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"].ToString()
+                        );
+                    // TODO: Download Posts, images and videos.
+                    FileInformation dlInfo = await MainDownloader.GetFileType(_rand_postJson);
+
+                    if (dlInfo.isGallery)
+                    {
+                        FormattedLinks galleryData = await GetRedditGallery.FormatLinks(_rand_postJson);
+                        List<Stream> streams = await GetRedditGallery.GetGallery(galleryData);
+
+                        for (int i = 0; i < streams.Count; i++)
+                        {
+                            FileStream newFile = File.Create(DownloadPath);
+                            streams?[i].CopyToAsync(newFile);
+                        }
+                    }
+                }
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             BotConfigurations.bots[listIdentifier] = false;
-            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} [gray]-[/] [red]Has suffered an exception. Logging to log file![/]");
-            await Logger.LOGE(
-                "An Exception occured! Stack Trace:\r\n" +
-                "--------BEGIN STACK TRACE\r\n" +
-                $"{JsonConvert.SerializeObject(ex.ToString(), Formatting.Indented)}\r\n" +
-                "--------END STACK TRACE",
-                "BotLogic");
+            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an error.");
+            crashArgs.exception = ex;
+            BotEvents.OnBotCrash?.Invoke(this, crashArgs);
         }
     }
 
@@ -103,9 +114,17 @@ public class BotMain
 
 #nullable disable
 
-    public static async void TriggerWhenBotCreated(object sender, BotEvents.BotCreationArgs arguments)
+    public static async void TriggerWhenBotCreated(object sender, BotEvents.BotCreationArgs arguments) 
+        => await Logger.LOGI($"Class of type \'{sender?.GetType()}\' has started a new bot with name \'{arguments?.BotName}\'", "BotLogic -> BotEvents.OnCreate");
+
+    public static async void TriggerWhenBotCrash(object sender, BotEvents.BotCrashArgs arguments)
     {
-        await Logger.LOGI($"Class of type \'{sender.GetType()}\' has started a new bot with name \'{arguments.BotName}\'", "BotLogic -> BotEvents.OnCreate");
+        await Logger.LOGE(
+            "An Exception occured! Stack Trace:\r\n" +
+            "--------BEGIN STACK TRACE\r\n" +
+            $"{JsonConvert.SerializeObject(arguments.exception?.ToString(), Formatting.Indented)}\r\n" +
+            "--------END STACK TRACE",
+            "BotLogic");
     }
 
 #nullable restore
@@ -115,7 +134,7 @@ public static class BotEvents
 {
     public static EventHandler<BotCreationArgs> OnBotCreate;
     public static EventHandler<BotDownloadArgs> OnBotFinishDownload;
-
+    public static EventHandler<BotCrashArgs> OnBotCrash;
     public class BotCreationArgs : EventArgs
     {
         public string BotName { get; set; }
@@ -126,6 +145,10 @@ public static class BotEvents
         public string BotName { get; set; }
         public string FileName { get; set; }
         public ulong FileSize { get; set; }
+    }
+    public class BotCrashArgs : EventArgs
+    {
+        public Exception exception { get; set; }
     }
 }
 

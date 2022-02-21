@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ public static class MainDownloader
         string contentUrl = (string)Result["url_overridden_by_dest"];
         string contentDomain = (string)Result["domain"];
         fileInfo.isNSFW = (bool)Result["over_18"];
-        fileInfo.PostTitle = ((string)Result["title"]).Trim(Path.GetInvalidFileNameChars()).Trim(new char[] { '\"', '\'' });
+        fileInfo.PostTitle = ((string)Result["title"]);
 
         if (contentDomain == "i.redd.it")
         {
@@ -61,7 +62,18 @@ public static class MainDownloader
             fileInfo.FileTypes = FileTypes.Unknown;
             fileInfo.FileExtension = ".htm";
         }
-        fileInfo.FileName = fileInfo.PostTitle + fileInfo.FileExtension;
+        fileInfo.FileName = fileInfo.PostTitle.Trim(Path.GetInvalidFileNameChars()).Trim(new char[] { '\"', '\'' }) + fileInfo.FileExtension;
+        List<char> illegalChars = Path.GetInvalidFileNameChars().ToList();
+
+        // Add extra chars to avoid CI dying when testing
+        illegalChars.Add('\"');
+        illegalChars.Add('\'');
+        illegalChars.Add('*');
+
+        for (int i = 0; i < fileInfo.PostTitle.Length; i++)
+        {
+            fileInfo.PostTitle = fileInfo.PostTitle.Replace(illegalChars[i], ' ');
+        }
         return fileInfo;
     }
 }

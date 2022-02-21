@@ -63,7 +63,14 @@ public static class MainActivity
             File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup");
             if (setupMode)
             {
-                string jsonBase = JsonConvert.SerializeObject(new JSONData());
+                JSONData baseJDat = new JSONData()
+                {
+                    targetSubReddits = new()
+                    { "shitposting", "memes" },
+                    multiThreaded = true,
+                    threads = (byte)Environment.ProcessorCount
+                };
+                string jsonBase = JsonConvert.SerializeObject(baseJDat, Formatting.Indented);
                 File.WriteAllText(Environment.CurrentDirectory + "\\Configurations.json", jsonBase);
                 AnsiConsole.MarkupLine("[green bold]Setup complete![/]");
                 Environment.Exit(0);
@@ -97,6 +104,8 @@ public static class MainActivity
 
         #endregion Check if configurations exist.
 
+        BotConfigurations.targetSubreddits = progData.targetSubReddits.ToArray();
+
         string threadAmount = "";
 
         if (progData.multiThreaded)
@@ -105,9 +114,16 @@ public static class MainActivity
         AnsiConsole.MarkupLine(
              " - Program Settings:\r\n" +
             $" - Multi-Threading: {progData.multiThreaded}\r\n" +
-            $" - Target Subreddits: [green]{ParseArrayToString(progData.targetSubReddits)}[/]\r\n" +
+            $" - Target Subreddits: [green]{ParseArrayToString(progData.targetSubReddits.ToArray()).Result.RemoveMarkup()}[/]\r\n" +
             $" - Allow NSFW: {progData.allowNSFW}\r\n" +
             $"{threadAmount}");
+
+        AnsiConsole.MarkupLine(" - Creating Folders for Downloaded content...");
+        for (int i = 0; i < progData.targetSubReddits.Count; i++)
+        {
+            Directory.CreateDirectory(BotMain.DownloadPath + $"{progData.targetSubReddits[i]}\\");
+        }
+
         await BotMain.Instance.StartBots(progData.multiThreaded, progData.threads);
     }
 

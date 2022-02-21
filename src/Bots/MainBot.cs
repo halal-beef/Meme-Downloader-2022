@@ -71,7 +71,7 @@ public class BotMain
                     #region Get Post Address
 
                     JObject _result = JObject.Parse(
-                            (string)JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"]
+                            JArray.Parse(_rand_postJson)[0]["data"]["children"][0]["data"].ToString()
                         );
 
                     #endregion Get Post Address
@@ -150,14 +150,18 @@ public class BotMain
                 {
                     i = BotConfigurations.bots.FindIndex(i, quickDetect);
 
-                    // Re-Run bots.
-                    _args.BotName = $"Bot {i}";
-                    Thread newBot = new(async () => await BotLogic(i));
-                    newBot.Name = _args.BotName;
-                    newBot.Start();
-                    BotEvents.OnBotCreate?.Invoke(this, _args);
+                    if (i != -1)
+                    {
+                        // Re-Run bots.
+                        _args.BotName = $"Bot {i}";
+                        Thread newBot = new(async () => await BotLogic(i));
+                        newBot.Name = _args.BotName;
+                        newBot.Start();
+                        BotEvents.OnBotCreate?.Invoke(this, _args);
 
-                    BotConfigurations.bots[i] = true;
+                        BotConfigurations.bots[i] = true;
+                    }
+                    else break;
                 }
                 await Task.Delay(420);
             }
@@ -203,9 +207,6 @@ public class BotMain
         await BotRestarter();
         await Task.Delay(-1); // Avoid program's termination.
     }
-
-#nullable disable
-#nullable restore
 }
 
 public struct BotConfigurations

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 
@@ -70,13 +71,13 @@ public struct JSONData
     /// The array of the target subreddits.
     /// </summary>
     [JsonProperty("Target Sub Reddits")]
-    public string[] targetSubReddits;
+    public List<string> targetSubReddits;
 
     /// <summary>
     /// The amount of threads that should be used, IGNORED IF multiThreaded is false
     /// </summary>
     [JsonProperty("Thread Count")]
-    public byte threads;
+    public int threads;
 
     /// <summary>
     /// Initialize JSON Data.
@@ -84,7 +85,7 @@ public struct JSONData
     /// <param name="allowNSFW">Should the program download posts categorized as NSFW? if <see langword="true"/> it will download them.</param>
     /// <param name="multiThreaded">Should the program run in a multi threaded way? if <see langword="true"/> it will run with the amount of Threads specified</param>
     /// <param name="targetSubReddits"></param>
-    public JSONData(bool allowNSFW, bool multiThreaded, string[] targetSubReddits, byte threads)
+    public JSONData(bool allowNSFW, bool multiThreaded, List<string> targetSubReddits, int threads)
     {
         this.allowNSFW = allowNSFW;
         this.multiThreaded = multiThreaded;

@@ -8,6 +8,7 @@ namespace Dottik.MemeDownloader.Logging;
 public static class Logger
 {
     private static readonly int currentPID = Environment.ProcessId;
+    private static object locker = new();
 
     /// <summary>
     /// Log ERROR to the log file.
@@ -44,12 +45,18 @@ public static class Logger
 
     private static async Task WriteLog(string msg)
     {
-        string targetFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Dottik\\MD2022\\Logs\\",
-            logFileName = $"{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log";
-        if (!File.Exists(targetFolder + logFileName))
+        await Task.Run(() =>
         {
-            await File.CreateText(targetFolder + logFileName).DisposeAsync();
-        }
-        await File.AppendAllTextAsync(targetFolder + logFileName, msg + "\r\n");
+            lock (locker)
+            {
+                string targetFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Dottik\\MD2022\\Logs\\",
+                    logFileName = $"{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log";
+                if (!File.Exists(targetFolder + logFileName))
+                {
+                    File.CreateText(targetFolder + logFileName).Dispose();
+                }
+                File.AppendAllText(targetFolder + logFileName, msg + "\r\n");
+            }
+        });
     }
 }

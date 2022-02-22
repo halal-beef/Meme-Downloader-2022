@@ -45,7 +45,7 @@ public class BotMain
         await Logger.LOGE(
             $"An Exception occured in \'{sender?.GetType()}\'! Stack Trace:\r\n" +
             "--------BEGIN STACK TRACE\r\n" +
-            $"{JsonConvert.SerializeObject(arguments.exception?.ToString(), Formatting.Indented)}\r\n" +
+            $"{arguments.exception?.ToString()}" +
             "--------END STACK TRACE",
             "BotLogic");
     }

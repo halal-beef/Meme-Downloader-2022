@@ -95,12 +95,27 @@ public static class GetRedditGallery
     /// <returns>A List of streams containing the data of images.</returns>
     public static async Task<List<Stream>> GetGallery(FormattedLinks _formattedLinkData)
     {
-        List<Stream> data = new();
+        List<Stream> finalStream = new();
+        List<Task<Stream>> taskStreams = new();
         if (_formattedLinkData.Links.Count > 0 && _formattedLinkData.Extensions.Count > 0)
         {
             for (int i = 0; i < _formattedLinkData.Links.Count; i++)
             {
-                data.Add(await ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]));
+                taskStreams.Add(ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]));
+            }
+            while (taskStreams.Count > 0)
+            {
+                Task<Stream> terminatedTask = await Task.WhenAny(taskStreams);
+
+                // Remove the task that is already done.
+                for (int i = 0; i < taskStreams.Count; i++)
+                {
+                    if (terminatedTask == taskStreams[i])
+                    {
+                        finalStream.Add(terminatedTask.Result);
+                        taskStreams.RemoveAt(i);
+                    }
+                }
             }
         }
         else
@@ -108,7 +123,7 @@ public static class GetRedditGallery
             await Logger.LOGE("Failed to get gallery! Invalid Gallery Data was presented.", "Downloader -> Gallery");
             throw new Exception("Download Error -> Invalid Gallery Data.");
         }
-        return data;
+        return finalStream;
     }
 
     private static int GetJTokenChildrenLength(JObject token) => token.Children().ToArray().Length;

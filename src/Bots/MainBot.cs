@@ -1,6 +1,5 @@
 ﻿using Dottik.MemeDownloader.Downloader;
 using Dottik.MemeDownloader.Logging;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Spectre.Console;
 using System;
@@ -88,7 +87,7 @@ public class BotMain
 
                         for (int i = 0; i < streams.Count; i++)
                         {
-                            FileStream newFile = File.Create($"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\__GALLERY_{i}_{dlInfo.FileName}");
+                            FileStream newFile = File.Create($"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\__GALLERY_{i}_{dlInfo.FileName + ".jpg"}"); // Temporal fix, make all images .jpg till I work on the solution to this.
                             streams?[i].CopyToAsync(newFile);
                             await newFile.FlushAsync();
                             await newFile.DisposeAsync();
@@ -128,7 +127,14 @@ public class BotMain
         }
         catch (Exception ex)
         {
-            BotConfigurations.bots[listIdentifier] = false;
+            try
+            {
+                BotConfigurations.bots[listIdentifier] = false;
+            }
+            catch
+            {
+                await Logger.LOGE("ERROR DISABLING BOT IN LIST!", "BotLogic -> Exception Handler");
+            }
             AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an error.");
             crashArgs.exception = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);
@@ -137,34 +143,44 @@ public class BotMain
 
     public async Task BotRestarter()
     {
-        while (true)
+        BotEvents.BotCrashArgs crashArgs = new();
+        try
         {
-            BotEvents.BotCreationArgs _args = new();
-            Predicate<bool> quickDetect = new(a => !a);
-            float x = 0;
-            x = BotConfigurations.bots.FindAll(quickDetect).Count - BotConfigurations.bots.Count;
-
-            if (x < BotConfigurations.bots.Count / 2)
+            while (true)
             {
-                for (int i = 0; i < BotConfigurations.bots.Count; i++)
+                BotEvents.BotCreationArgs _args = new();
+                Predicate<bool> quickDetect = new(a => !a);
+                float x = 0;
+                x = BotConfigurations.bots.FindAll(quickDetect).Count - BotConfigurations.bots.Count;
+
+                if (x < BotConfigurations.bots.Count / 2)
                 {
-                    i = BotConfigurations.bots.FindIndex(i, quickDetect);
-
-                    if (i != -1)
+                    for (int i = 0; i < BotConfigurations.bots.Count; i++)
                     {
-                        // Re-Run bots.
-                        _args.BotName = $"Bot {i}";
-                        Thread newBot = new(async () => await BotLogic(i));
-                        newBot.Name = _args.BotName;
-                        newBot.Start();
-                        BotEvents.OnBotCreate?.Invoke(this, _args);
+                        i = BotConfigurations.bots.FindIndex(i, quickDetect);
 
-                        BotConfigurations.bots[i] = true;
+                        if (!(i == -1) && i >= 0 && i < BotConfigurations.bots.Count)
+                        {
+                            // Re-Run bots.
+                            _args.BotName = $"Bot {i}";
+                            Thread newBot = new(async () => await BotLogic(i));
+                            newBot.Name = _args.BotName;
+                            newBot.Start();
+                            BotEvents.OnBotCreate?.Invoke(this, _args);
+
+                            BotConfigurations.bots[i] = true;
+                        }
+                        else break;
                     }
-                    else break;
+                    await Task.Delay(420);
                 }
-                await Task.Delay(420);
             }
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an error.");
+            crashArgs.exception = ex;
+            BotEvents.OnBotCrash?.Invoke(this, crashArgs);
         }
     }
 
@@ -191,14 +207,15 @@ public class BotMain
 
         #region Start the bots with a loop
 
-        for (int i = 0; i < _threadAmount; i++)
+        for (int i = -1; i < _threadAmount; i++)
         {
             _args.BotName = $"Bot {i}";
-            Thread newBot = new(async () => await BotLogic(i));
             BotConfigurations.bots.Add(true);
+            Thread newBot = new(async () => await BotLogic(i));
             newBot.Name = _args.BotName;
             newBot.Start();
             BotEvents.OnBotCreate?.Invoke(this, _args);
+            Thread.Sleep(100);
         }
 
         #endregion Start the bots with a loop

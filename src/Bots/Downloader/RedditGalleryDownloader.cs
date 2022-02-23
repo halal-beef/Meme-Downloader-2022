@@ -40,24 +40,25 @@ public static class GetRedditGallery
 
         List<string> _linksId = new();
 
-        StringBuilder extensionTemp = new("");
+        StringBuilder extensionTemp = new();
 
         int _mediaIdCount;
 
         JObject _mediaIds, _mediaExtension;
         try
         {
-            _mediaIds = GetMediaIds(Json);
-            _mediaExtension = GetMediaExtension(Json);
+            _mediaIds = GetGalleryData(Json);
+            _mediaExtension = GetGalleryMetadata(Json);
             _mediaIdCount = GetJTokenChildrenLength(_mediaIds);
-
-            for (int i = 0; i < _mediaIdCount; i++)
+            await File.WriteAllTextAsync(Environment.CurrentDirectory + "\\galleryJson.json", Json);
+            for (int i = 0; i < _mediaIds["items"].Count(); i++)
             {
-                _linksId.Add(_mediaIds["items"][i].ToString());
+                _linksId.Add(_mediaIds["items"][i]["media_id"].ToString());
             }
+
             for (int i = 0; i < _linksId.Count; i++)
             {
-                extensionTemp.Append(_mediaExtension[_linksId[i]]["m"].ToString());
+                extensionTemp?.Append(_mediaExtension?[_linksId[i]]?["m"]?.ToString());
                 string extmp = extensionTemp.ToString();
                 string exfinal = "";
                 // Get Extension.
@@ -128,7 +129,7 @@ public static class GetRedditGallery
 
     private static int GetJTokenChildrenLength(JObject token) => token.Children().ToArray().Length;
 
-    private static JObject GetMediaExtension(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["media_metadata"].ToString());
+    private static JObject GetGalleryMetadata(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["media_metadata"].ToString());
 
-    private static JObject GetMediaIds(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["gallery_data"].ToString());
+    private static JObject GetGalleryData(string json) => JObject.Parse(JArray.Parse(json)[0]["data"]["children"][0]["data"]["gallery_data"].ToString());
 }

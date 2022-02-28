@@ -189,7 +189,7 @@ public class BotMain
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an error.");
+            AnsiConsole.MarkupLine("Bot Restarter Has ended it's task due to an [red]error[/].");
             crashArgs.exception = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);
         }

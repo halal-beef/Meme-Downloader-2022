@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Dottik.MemeDownloader.Downloader;
 
@@ -116,11 +117,23 @@ public static class GetRedditGallery
                 // Remove the task that is already done.
                 for (int i = 0; i < taskStreams.Count; i++)
                 {
-                    if (terminatedTask == taskStreams[i])
+                    try
                     {
-                        finalStream.Add(terminatedTask.Result);
-                        taskStreams.RemoveAt(i);
+                        if (terminatedTask == taskStreams[i])
+                        {
+                            finalStream.Add(terminatedTask.Result);
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        await Logger.LOGE($"Bot {Thread.CurrentThread.Name} Could not get image from gallery with error \'{ex.Message}\'. " +
+                            $"Full Stack Trace -> \r\n" +
+                            $"--------START STACK TRACE\r\n" +
+                            $"{ex}\r\n" +
+                            $"--------END STACK TRACE\r\n",
+                            "Downloader -> GetGalleryAsync()");
+                    }
+                    finally { taskStreams.RemoveAt(i); }
                 }
             }
         }

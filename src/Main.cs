@@ -68,6 +68,9 @@ public static class MainActivity
         if (setupMode || !File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\"))
         {
             AnsiConsole.MarkupLine("[yellow]Preparing Dependencies[/]...");
+            // Init HttpClient, else no instance.
+            ProgramData.InitializeWebVariables();
+
             if (!setupMode)
             {
                 await EnvironmentConfig.RestoreDependencies(true);

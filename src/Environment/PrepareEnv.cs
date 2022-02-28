@@ -63,7 +63,7 @@ public static class EnvironmentConfig
             string tempDLPath = Path.GetTempFileName();
             FileStream tmpPth = File.OpenWrite(tempDLPath);
 
-            await ProgramData.Client.GetStreamAsync("https://github.com/usrDottik/Stuff/releases/download/fmpgwin/ffmpeg.exe").Result.CopyToAsync(tmpPth).Dispose();
+            await ProgramData.Client.GetStreamAsync("https://github.com/usrDottik/Stuff/releases/download/fmpgwin/ffmpeg.exe").Result.CopyToAsync(tmpPth);
 
             // Flush and Dispose!
             await tmpPth.FlushAsync();
@@ -82,7 +82,7 @@ public static class EnvironmentConfig
             string finalPath = Environment.CurrentDirectory + "/Dependencies/ffmpeg";
             FileStream tmpPth = File.OpenWrite(tempDLPath);
 
-            await ProgramData.Client.GetStreamAsync("https://github.com/usrDottik/Stuff/releases/download/fmpglin/ffmpeg").Result.CopyToAsync(tmpPth).Dispose();
+            await ProgramData.Client.GetStreamAsync("https://github.com/usrDottik/Stuff/releases/download/fmpglin/ffmpeg").Result.CopyToAsync(tmpPth);
 
             // Flush and Dispose!
             await tmpPth.FlushAsync();

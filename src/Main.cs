@@ -60,7 +60,7 @@ public static class MainActivity
                     new Thread(() =>
                     {
                         Thread.Sleep(60 * 1000);
-                        AnsiConsole.MarkupLine($"LOG: \r\n\r\n\r\n[yellow]{File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\Logs\\{$"{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log"}")}[/]");
+                        AnsiConsole.MarkupLine($"LOG: \r\n\r\n\r\n[yellow]{File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\Logs\\{$"{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log"}").RemoveMarkup()}[/]");
                         Environment.Exit(0);
                     }).Start();
                     goto NORMALEXEC;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -6,6 +7,7 @@ namespace Dottik.MemeDownloader;
 
 public static class EnvironmentConfig
 {
+    private static Stream stub = Stream.Null;
     public static bool ffmpegBad { get; private set; } = false;
 
     public static async Task<bool> CheckDependencyState()

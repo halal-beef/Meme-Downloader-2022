@@ -7,8 +7,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dottik.MemeDownloader;
 
@@ -62,17 +62,26 @@ public static class MainActivity
                         Environment.Exit(0);
                     }).Start();
                     goto NORMALEXEC;
-                    break;
             }
         }
 
         if (setupMode || !File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\"))
         {
             AnsiConsole.MarkupLine("[yellow]Preparing Dependencies[/]...");
-            await EnvironmentConfig.RestoreDependencies();
             if (!setupMode)
+            {
+                await EnvironmentConfig.RestoreDependencies(true);
                 AnsiConsole.MarkupLine("[green]Dependencies Downloaded![/] Proceeding...");
-
+            }
+            else
+            {
+                await EnvironmentConfig.CheckDependencyState();
+                if (EnvironmentConfig.ffmpegBad is true)
+                {
+                    AnsiConsole.MarkupLine("[green]Dependency ffmpeg failed the integrity test, redownloading...[/]");
+                    await EnvironmentConfig.RestoreDependencies(false);
+                }
+            }
             File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup");
             if (setupMode)
             {
@@ -102,6 +111,12 @@ public static class MainActivity
 
         #endregion Declare some variables
 
+        #region Add to PATH Var (Process Only)
+
+        Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + $";{Environment.CurrentDirectory}\\Dependencies\\", EnvironmentVariableTarget.Process);
+
+        #endregion Add to PATH Var (Process Only)
+
         #region Check if configurations exist.
 
         if (File.Exists(Environment.CurrentDirectory + "\\Configurations.json"))
@@ -110,7 +125,7 @@ public static class MainActivity
         }
         else
         {
-            AnsiConsole.MarkupLine($"run \'{Environment.ProcessPath} -setup\'");
+            AnsiConsole.MarkupLine($"please run \'{Environment.ProcessPath} -setup\' to setup Meme Downloader 2022 {ProgramData.versionName}");
             Environment.Exit(-2);
         }
 

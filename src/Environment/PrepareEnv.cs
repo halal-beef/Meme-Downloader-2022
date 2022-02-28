@@ -1,14 +1,12 @@
 ﻿using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Mono.Unix;
 
 namespace Dottik.MemeDownloader;
 
 public static class EnvironmentConfig
 {
-    private static bool ffmpegBad = false;
+    public static bool ffmpegBad { get; private set; } = false;
 
     public static async Task<bool> CheckDependencyState()
     {
@@ -53,9 +51,9 @@ public static class EnvironmentConfig
         return true;
     }
 
-    public static async Task RestoreDependencies()
+    public static async Task RestoreDependencies(bool overrideChecks = false)
     {
-        if (ffmpegBad)
+        if (ffmpegBad || overrideChecks)
         {
 #if WINDOWS
 
@@ -90,8 +88,8 @@ public static class EnvironmentConfig
             await tmpPth.DisposeAsync();
             tmpPth.Close();
             File.Move(tempDLPath, finalPath, true);
-            UnixFileInfo ffmpegFInfo = new(finalPath);
-            ffmpegFInfo.FileAccessPermissions = FileAccessPermissions.UserReadWriteExecute; // Hacker level permission editing
+            Mono.Unix.UnixFileInfo ffmpegFInfo = new(finalPath);
+            ffmpegFInfo.FileAccessPermissions = Mono.Unix.FileAccessPermissions.UserReadWriteExecute; // Hacker level permission editing
             GC.Collect();
 
             #endregion Download ffmpeg Linux Build.

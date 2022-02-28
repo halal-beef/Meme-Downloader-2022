@@ -21,6 +21,7 @@ public static class MainActivity
     public static async Task Main(string[] args)
     {
         #region Obligatory Folder Creation.
+
         string currentFolder = Environment.CurrentDirectory;
         string[] foldersToCreate = new string[] {
             $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Dottik/MD2022/",
@@ -59,6 +60,7 @@ public static class MainActivity
                     new Thread(() =>
                     {
                         Thread.Sleep(60 * 1000);
+                        AnsiConsole.MarkupLine($"LOG: \r\n\r\n\r\n[yellow]{File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\Logs\\{$"{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log"}")}[/]");
                         Environment.Exit(0);
                     }).Start();
                     goto NORMALEXEC;

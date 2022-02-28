@@ -80,6 +80,11 @@ public class BotMain
 
                     #region Check if Gallery and Download.
 
+                    if (!Uri.TryCreate(dlInfo.DownloadURL, UriKind.RelativeOrAbsolute, out Uri? parsedUri))
+                    {
+                        throw new InvalidProgramException($"URI Parse Failed! URL is {dlInfo.DownloadURL}");
+                    }
+
                     if (dlInfo.IsGallery)
                     {
                         FormattedLinks galleryData = await GetRedditGallery.FormatLinks(_rand_postJson);

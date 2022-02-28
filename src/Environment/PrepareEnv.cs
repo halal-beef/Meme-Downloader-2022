@@ -89,7 +89,7 @@ public static class EnvironmentConfig
             await tmpPth.DisposeAsync();
             tmpPth.Close();
             File.Move(tempDLPath, Environment.CurrentDirectory + "/Dependencies/ffmpeg", true);
-            Mono.Unix.UnixFileInfo ffmpegFInfo = new(finalPath);
+            Mono.Unix.UnixFileInfo ffmpegFInfo = new(Environment.CurrentDirectory + "/Dependencies/ffmpeg");
             ffmpegFInfo.FileAccessPermissions = Mono.Unix.FileAccessPermissions.UserReadWriteExecute; // Hacker level permission editing
             GC.Collect();
 

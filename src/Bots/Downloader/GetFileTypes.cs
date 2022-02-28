@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dottik.MemeDownloader.Utilities;
 
 namespace Dottik.MemeDownloader.Downloader;
 
@@ -71,19 +72,10 @@ public static class MainDownloader
             }
         });
 
-        List<char> illegalChars = Path.GetInvalidFileNameChars().ToList();
-        // Add extra chars to avoid problems.
-        illegalChars.Add('\"');
-        illegalChars.Add('\'');
-        illegalChars.Add('*');
-        illegalChars.Add('?');
-
-        for (int i = 0; i < fileInfo.PostTitle.Length; i++)
-        {
-            fileInfo.PostTitle = fileInfo.PostTitle.Replace(illegalChars[i], ' ');
-        }
+        fileInfo.PostTitle = await EnvironmentUtilities.SanitizeString(fileInfo.PostTitle);
 
         fileInfo.FileName = fileInfo.PostTitle + fileInfo.FileExtension;
+
         return fileInfo;
     }
 }

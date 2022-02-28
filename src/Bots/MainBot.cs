@@ -44,7 +44,7 @@ public class BotMain
         await Logger.LOGE(
             $"An Exception occured in \'{sender?.GetType()}\'! Stack Trace:\r\n" +
             "--------BEGIN STACK TRACE\r\n" +
-            $"{arguments.exception?.ToString()}" +
+            $"{arguments.exception?.ToString()}\r\n" +
             "--------END STACK TRACE",
             "BotLogic");
     }
@@ -83,12 +83,13 @@ public class BotMain
                     if (dlInfo.IsGallery)
                     {
                         FormattedLinks galleryData = await GetRedditGallery.FormatLinks(_rand_postJson);
-                        List<Stream> streams = await GetRedditGallery.GetGallery(galleryData);
+                        List<Stream> streams = await GetRedditGallery.GetGalleryAsync(galleryData);
 
                         for (int i = 0; i < streams.Count; i++)
                         {
-                            FileStream newFile = File.Create($"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\__GALLERY_{i}_{dlInfo.FileName + ".jpg"}"); // Temporal fix, make all images .jpg till I work on the solution to this.
-                            streams?[i].CopyToAsync(newFile);
+                            // TODO: Download Galleries correctly, not just append .jpg to end.
+                            FileStream newFile = File.Create($"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\__GALLERY_{i}_{dlInfo.FileName + ".jpg"}");
+                            await streams?[i].CopyToAsync(newFile);
                             await newFile.FlushAsync();
                             await newFile.DisposeAsync();
                             newFile.Close();
@@ -140,7 +141,7 @@ public class BotMain
                 $"\r\n" +
                 $"An Exception occured in \'{this.GetType()}\'! Stack Trace:\r\n" +
                 "[yellow]--------BEGIN STACK TRACE[/]\r\n" +
-                $"{ex}" +
+                $"{ex}\r\n" +
                 "[yellow]--------END STACK TRACE[/][/]\r\n");
             crashArgs.exception = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);

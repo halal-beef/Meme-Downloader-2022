@@ -24,6 +24,7 @@ public struct FormattedLinks
 
     public FormattedLinks()
     {
+        // Filler code!
     }
 }
 
@@ -97,7 +98,7 @@ public static class GetRedditGallery
     /// <param name="_formattedLinkData"></param>
     /// <exception cref="Exception">Thrown if the Gallery data is invalid.</exception>
     /// <returns>A List of streams containing the data of images.</returns>
-    public static async Task<List<Stream>> GetGallery(FormattedLinks _formattedLinkData)
+    public static async Task<List<Stream>> GetGalleryAsync(FormattedLinks _formattedLinkData)
     {
         List<Stream> finalStream = new();
         List<Task<Stream>> taskStreams = new();

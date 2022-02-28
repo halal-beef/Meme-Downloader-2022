@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Meme Downloader 2022": {
+      "commandName": "Project"
+    },
+    "Meme Downloader 2022 (SETUP MODE)": {
+      "commandName": "Project",
+      "commandLineArgs": "-setup"
+    },
+    "Meme Downloader 2022 (CI MODE)": {
+      "commandName": "Project",
+      "commandLineArgs": "-ci"
+    }
+  }
+}

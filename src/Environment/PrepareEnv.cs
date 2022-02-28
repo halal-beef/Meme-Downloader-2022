@@ -8,7 +8,7 @@ namespace Dottik.MemeDownloader;
 public static class EnvironmentConfig
 {
     private static Stream stub = Stream.Null;
-    public static bool ffmpegBad { get; private set; } = false;
+    public static bool ffmpegBad { get; private set; }
 
     public static async Task<bool> CheckDependencyState()
     {
@@ -28,11 +28,11 @@ public static class EnvironmentConfig
             string ffmpegHash = HashToString(await sha256Gen.ComputeHashAsync(ffmpegStream));
             await ffmpegStream.DisposeAsync();
             ffmpegStream.Close();
-            passes[0] = ffmpegHash.ToLower().Equals(expected_ffmpegHash.ToLower());
+            passes[0] = ffmpegHash.ToLower().Equals(expected_ffmpegHash);
         }
         else { passes[0] = false; }
 #elif LINUX
-        expected_ffmpegHash = "B8ABA52A98315C8B23917CCCEFA86D11CD2D630C459009FECECE3752AD2155DC";
+        expected_ffmpegHash = "B8ABA52A98315C8B23917CCCEFA86D11CD2D630C459009FECECE3752AD2155DC".ToLower();
         // Compute FFMPEG binary hash, and compare it to the expected one.
         if (File.Exists(localPath + "/Dependencies/ffmpeg"))
         {
@@ -40,7 +40,7 @@ public static class EnvironmentConfig
             string ffmpegHash = HashToString(await sha256Gen.ComputeHashAsync(ffmpegStream));
             await ffmpegStream.DisposeAsync();
             ffmpegStream.Close();
-            passes[0] = ffmpegHash.ToLower().Equals(expected_ffmpegHash.ToLower());
+            passes[0] = ffmpegHash.ToLower().Equals(expected_ffmpegHash);
         }
         else { passes[0] = false; }
 #endif
@@ -55,7 +55,7 @@ public static class EnvironmentConfig
 
     public static async Task RestoreDependencies(bool overrideChecks = false)
     {
-        if (ffmpegBad || overrideChecks)
+        if (overrideChecks || ffmpegBad)
         {
 #if WINDOWS
 

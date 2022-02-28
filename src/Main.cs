@@ -21,13 +21,13 @@ public static class MainActivity
     public static async Task Main(string[] args)
     {
         #region Obligatory Folder Creation.
-
+        string currentFolder = Environment.CurrentDirectory;
         string[] foldersToCreate = new string[] {
-            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Dottik\\MD2022\\",
-            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Dottik\\MD2022\\Logs",
-            $"{Environment.CurrentDirectory}\\Dependencies\\",
-            $"{Environment.CurrentDirectory}\\Temp\\",
-            $"{Environment.CurrentDirectory}\\Downloaded Content\\"};
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Dottik/MD2022/",
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Dottik/MD2022/Logs",
+            $"{currentFolder}/Dependencies/",
+            $"{currentFolder}/Temp/",
+            $"{currentFolder}/Downloaded Content/"};
 
         EnvironmentUtilities.BatchCreateFolders(foldersToCreate);
 

@@ -4,4 +4,5 @@
 dotnet publish "/home/runner/work/Meme-Downloader-2022/Meme-Downloader-2022/Meme Downloader 2022.csproj" /p:DefineConstants=LINUX --output "build\\" --arch x64 --os linux -c release --self-contained true # linux build
 cd /home/runner/work/Meme-Downloader-2022/Meme-Downloader-2022/build/
 chmod +x "Meme Downloader 2022"
+./"Meme Downloader 2022" -setup
 ./"Meme Downloader 2022" -ci

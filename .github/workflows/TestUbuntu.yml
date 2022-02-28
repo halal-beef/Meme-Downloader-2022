@@ -19,7 +19,7 @@ jobs:
         
     - name: Build And Test!
       run: |
-        chmod +x TestBuild.sh && ./TestBuild.sh && ls /home/runner/work/Meme-Downloader-2022/Meme-Downloader-2022/build/Downloaded\ Content/
+        chmod +x TestBuild.sh && ./TestBuild.sh && ls /home/runner/work/Meme-Downloader-2022/Meme-Downloader-2022/build/
       
     - uses: actions/upload-artifact@v2
       with:

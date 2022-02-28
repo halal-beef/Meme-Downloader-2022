@@ -77,14 +77,17 @@ public static class GetRedditGallery
                     _galleryData.Extensions.Add(".jpeg");
                     exfinal = ".jpeg";
                 }
+
                 _galleryData.Links.Add($"https://i.redd.it/{_linksId[i]}{exfinal}");
             }
+
             return _galleryData;
         }
         catch (Exception ex)
         {
             await Logger.LOGE($"Error processing Gallery! \r\nStack Trace: {JsonConvert.SerializeObject(ex.ToString(), Formatting.Indented)}", "Downloader -> Gallery");
         }
+
         return _galleryData;
     }
 
@@ -104,6 +107,7 @@ public static class GetRedditGallery
             {
                 taskStreams.Add(ProgramData.Client.GetStreamAsync(_formattedLinkData.Links[i]));
             }
+
             while (taskStreams.Count > 0)
             {
                 Task<Stream> terminatedTask = await Task.WhenAny(taskStreams);
@@ -124,6 +128,7 @@ public static class GetRedditGallery
             await Logger.LOGE("Failed to get gallery! Invalid Gallery Data was presented.", "Downloader -> Gallery");
             throw new Exception("Download Error -> Invalid Gallery Data.");
         }
+
         return finalStream;
     }
 

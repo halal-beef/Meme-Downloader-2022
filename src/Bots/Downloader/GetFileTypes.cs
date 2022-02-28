@@ -52,7 +52,7 @@ public static class MainDownloader
             {
                 await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image Gallery!", "Downloader");
 
-                fileInfo.isGallery = true;
+                fileInfo.IsGallery = true;
             }
             else if (contentUrl.Contains("gif"))
             {

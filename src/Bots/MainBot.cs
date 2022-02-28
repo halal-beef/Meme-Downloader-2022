@@ -80,7 +80,7 @@ public class BotMain
 
                     #region Check if Gallery and Download.
 
-                    if (dlInfo.isGallery)
+                    if (dlInfo.IsGallery)
                     {
                         FormattedLinks galleryData = await GetRedditGallery.FormatLinks(_rand_postJson);
                         List<Stream> streams = await GetRedditGallery.GetGallery(galleryData);
@@ -135,6 +135,7 @@ public class BotMain
             {
                 await Logger.LOGE("ERROR DISABLING BOT IN LIST!", "BotLogic -> Exception Handler");
             }
+
             AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an error.");
             crashArgs.exception = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);
@@ -159,7 +160,7 @@ public class BotMain
                     {
                         i = BotConfigurations.bots.FindIndex(i, quickDetect);
 
-                        if (!(i == -1) && i >= 0 && i < BotConfigurations.bots.Count)
+                        if (i is not -1 && i >= 0 && i < BotConfigurations.bots.Count)
                         {
                             // Re-Run bots.
                             _args.BotName = $"Bot {i}";
@@ -170,8 +171,12 @@ public class BotMain
 
                             BotConfigurations.bots[i] = true;
                         }
-                        else break;
+                        else
+                        {
+                            break;
+                        }
                     }
+
                     await Task.Delay(420);
                 }
             }

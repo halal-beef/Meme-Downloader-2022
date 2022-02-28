@@ -29,7 +29,7 @@ public struct FileInformation
     {
         this.PostTitle = PostTitle;
         this.DownloadURL = DownloadURL;
-        this.isGallery = isGallery;
+        this.IsGallery = isGallery;
         this.isNSFW = isNSFW;
         this.FileExtension = FileExtension;
         this.FileName = FileName;
@@ -40,7 +40,7 @@ public struct FileInformation
     public string FileExtension { get; set; }
     public string FileName { get; set; }
     public FileTypes FileTypes { get; set; }
-    public bool isGallery { get; set; }
+    public bool IsGallery { get; set; }
     public bool isNSFW { get; set; }
     public string PostTitle { get; set; }
 }

@@ -45,7 +45,7 @@ public static class EnvironmentConfig
         else { passes[0] = false; }
 #endif
         // Set vars
-        ffmpegBad = passes[0];
+        ffmpegBad = !passes[0];
         // Dispose Elements.
         sha256Gen.Dispose();
         GC.Collect();

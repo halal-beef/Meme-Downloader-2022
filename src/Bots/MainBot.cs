@@ -80,9 +80,14 @@ public class BotMain
 
                     #region Check if Gallery and Download.
 
-                    if (!Uri.TryCreate(dlInfo.DownloadURL, UriKind.RelativeOrAbsolute, out Uri? parsedUri))
+                    if (!Uri.TryCreate(dlInfo.DownloadURL, UriKind.RelativeOrAbsolute, out Uri? parsedUri) && dlInfo.FileTypes is not FileTypes.Video)
                     {
                         throw new InvalidProgramException($"URI Parse Failed! URL is {dlInfo.DownloadURL}");
+                    }
+                    else if (dlInfo.FileTypes is FileTypes.Video)
+                    {
+                        AnsiConsole.MarkupLine("Video Downloading is not implemented yet.");
+                        continue;
                     }
 
                     if (dlInfo.IsGallery)

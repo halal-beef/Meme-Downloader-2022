@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Dottik.MemeDownloader;
 
@@ -50,6 +51,17 @@ public static class MainActivity
                 // Run initial setup & exit
                 case ProgramModes.SETUP:
                     setupMode = true;
+                    break;
+
+                case ProgramModes.TESTING:
+
+                    // Make a new thread that kills the program one minute afterwards.
+                    new Thread(() =>
+                    {
+                        Thread.Sleep(60 * 1000);
+                        Environment.Exit(0);
+                    }).Start();
+                    goto NORMALEXEC;
                     break;
             }
         }

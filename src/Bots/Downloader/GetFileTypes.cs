@@ -28,7 +28,9 @@ public static class MainDownloader
 
         await Task.Run(() =>
         {
-            contentUrl = (string)Result["url_overridden_by_dest"];
+            contentUrl =
+            (string)Result["url_overridden_by_dest"] is "" or null ? (string)Result["url"] : (string)Result["url_overridden_by_dest"];
+
             contentDomain = (string)Result["domain"];
             fileInfo.isNSFW = (bool)Result["over_18"];
             fileInfo.PostTitle = ((string)Result["title"]);

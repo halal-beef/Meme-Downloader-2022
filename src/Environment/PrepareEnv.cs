@@ -80,7 +80,6 @@ public static class EnvironmentConfig
             #region Download ffmpeg Linux Build.
 
             string tempDLPath = Path.GetTempFileName();
-            string finalPath = Environment.CurrentDirectory + "/Dependencies/ffmpeg";
             FileStream tmpPth = File.OpenWrite(tempDLPath);
 
             await ProgramData.Client.GetStreamAsync("https://github.com/usrDottik/Stuff/releases/download/fmpglin/ffmpeg").Result.CopyToAsync(tmpPth);
@@ -89,7 +88,7 @@ public static class EnvironmentConfig
             await tmpPth.FlushAsync();
             await tmpPth.DisposeAsync();
             tmpPth.Close();
-            File.Move(tempDLPath, finalPath, true);
+            File.Move(tempDLPath, Environment.CurrentDirectory + "/Dependencies/ffmpeg", true);
             Mono.Unix.UnixFileInfo ffmpegFInfo = new(finalPath);
             ffmpegFInfo.FileAccessPermissions = Mono.Unix.FileAccessPermissions.UserReadWriteExecute; // Hacker level permission editing
             GC.Collect();

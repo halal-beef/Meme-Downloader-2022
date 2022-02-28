@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -41,7 +42,8 @@ public static class EnvironmentConfig
     public static async Task RestoreDependencies()
     {
         // TODO: Restore Specific package if it's invalid now.
-        if (ffmpegBad)
+        // TODO V2: Restore FFMPEG for Linux.
+        if (ffmpegBad && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             string tempDLPath = Path.GetTempFileName();
             FileStream tmpPth = File.OpenWrite(tempDLPath);

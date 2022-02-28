@@ -8,7 +8,7 @@ namespace Dottik.MemeDownloader.Logging;
 public static class Logger
 {
     private static readonly int currentPID = Environment.ProcessId;
-    private static object locker = new();
+    private static readonly object locker = new();
 
     /// <summary>
     /// Log ERROR to the log file.
@@ -55,7 +55,13 @@ public static class Logger
                 {
                     File.CreateText(targetFolder + logFileName).Dispose();
                 }
+#if WINDOWS
                 File.AppendAllText(targetFolder + logFileName, msg + "\r\n");
+#elif LINUX
+                File.AppendAllText(targetFolder + logFileName, msg + "\n");
+#else
+                File.AppendAllText(targetFolder + logFileName, msg + $"{Environment.NewLine}"); // If platform is NOT define, then try to use Environment.NewLine to get the NewLine of the OS.
+#endif
             }
         });
     }

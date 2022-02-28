@@ -231,7 +231,7 @@ public struct BotConfigurations
     /// <summary>
     /// The list of <see cref="bool"/> to keep track of the bots running.
     /// </summary>
-    public static List<bool> bots = new();
+    public static volatile List<bool> bots = new();
 
     /// <summary>
     /// Is Running in MultiThreading mode.

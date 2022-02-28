@@ -53,6 +53,7 @@ public static class MainActivity
                     break;
             }
         }
+
         if (setupMode || !File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup\\"))
         {
             AnsiConsole.MarkupLine("[yellow]Preparing Dependencies[/]...");
@@ -63,12 +64,12 @@ public static class MainActivity
             File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup");
             if (setupMode)
             {
-                JSONData baseJDat = new JSONData()
+                JSONData baseJDat = new()
                 {
                     targetSubReddits = new()
                     { "shitposting", "memes" },
                     multiThreaded = true,
-                    threads = (byte)Environment.ProcessorCount
+                    threads = Environment.ProcessorCount
                 };
                 string jsonBase = JsonConvert.SerializeObject(baseJDat, Formatting.Indented);
                 File.WriteAllText(Environment.CurrentDirectory + "\\Configurations.json", jsonBase);
@@ -78,7 +79,6 @@ public static class MainActivity
         }
 
     NORMALEXEC:
-        AnsiConsole.MarkupLine("Starting Meme Downloader 2022...");
 
         #region Declare some variables
 
@@ -99,10 +99,12 @@ public static class MainActivity
         else
         {
             AnsiConsole.MarkupLine($"run \'{Environment.ProcessPath} -setup\'");
-            Environment.Exit(0);
+            Environment.Exit(-2);
         }
 
         #endregion Check if configurations exist.
+
+        AnsiConsole.MarkupLine("Starting Meme Downloader 2022...");
 
         BotConfigurations.targetSubreddits = progData.targetSubReddits.ToArray();
 
@@ -144,6 +146,7 @@ public static class MainActivity
                 return ProgramModes.TESTING;
             }
         }
+
         return ProgramModes.NORMAL;
     }
 
@@ -155,7 +158,7 @@ public static class MainActivity
             for (int i = 0; i < content.Length; i++)
             {
                 if (i != content.Length - 1)
-                    newString.Append(content[i] + ", ");
+                    newString.Append(content[i]).Append(", ");
                 else
                     newString.Append(content[i]);
             }

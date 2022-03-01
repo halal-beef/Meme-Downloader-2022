@@ -21,7 +21,7 @@ public static class EnvironmentConfig
 #nullable restore
 
 #if WINDOWS
-        expected_ffmpegHash = "1dc6d8a3760819c22baf6878513bc43a735f1e6c9e7c19b52ee2e1e77294d8a9";
+        expected_ffmpegHash = "c54ab015637c845aa053e94a4ed769915610c0628490e3f33e98e4763f61a804";
         // Compute FFMPEG Exe hash, and compare it to the expected one.
         if (File.Exists(localPath + "\\Dependencies\\ffmpeg.exe"))
         {

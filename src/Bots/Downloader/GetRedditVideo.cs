@@ -90,11 +90,15 @@ public static class RedditVideo
 
     #region Lambdas
 
-    private static string GetVideoLink(string rawJson) => JObject.Parse(JArray.Parse(rawJson)[0]["data"]["children"][0]["data"]["secure_media"]["reddit_video"]["fallback_url"].ToString()).ToString().Split('?')[0];
+    private static string GetVideoLink(string rawJson) => JObject.Parse(JArray.Parse(rawJson)[0]["data"]["children"][0]["data"]["secure_media"].ToString())
+        .GetValue("reddit_video")
+        .Value<string>("fallback_url")
+        .Split('?')[0];
 
-    private static string GetAudioLink(string rawJson) => JObject.Parse(JArray.Parse(rawJson)[0]["data"]["children"][0]["data"]["url_overridden_by_dest"].ToString()).ToString() + "/DASH_audio.mp4";
+    private static string GetAudioLink(string rawJson) => JObject.Parse(JArray.Parse(rawJson)[0]["data"]["children"][0]["data"].ToString())
+        .Value<string>("url_overridden_by_dest") + "/DASH_audio.mp4";
 
-    private static bool GetIfGif(string rawJson) => (bool)JObject.Parse(JArray.Parse(rawJson)[0]["data"]["children"][0]["data"]["secure_media"]["reddit_video"]["is_gif"].ToString());
+    private static bool GetIfGif(string rawJson) => JObject.Parse(JArray.Parse(rawJson)[0]["data"]["children"][0]["data"]["secure_media"]["reddit_video"].ToString()).Value<bool>("is_gif");
 
     #endregion Lambdas
 

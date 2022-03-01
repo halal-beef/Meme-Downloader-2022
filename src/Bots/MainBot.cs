@@ -80,16 +80,6 @@ public class BotMain
 
                     #region Check if Gallery and Download.
 
-                    if (!Uri.TryCreate(dlInfo.DownloadURL, UriKind.RelativeOrAbsolute, out Uri? parsedUri) && dlInfo.FileTypes is not FileTypes.Video)
-                    {
-                        throw new InvalidProgramException($"URI Parse Failed! URL is {dlInfo.DownloadURL}");
-                    }
-                    else if (dlInfo.FileTypes is FileTypes.Video)
-                    {
-                        AnsiConsole.MarkupLine("Video Downloading is not implemented yet.");
-                        continue;
-                    }
-
                     if (dlInfo.IsGallery)
                     {
                         FormattedLinks galleryData = await GetRedditGallery.FormatLinks(_rand_postJson);
@@ -104,9 +94,24 @@ public class BotMain
                             await newFile.DisposeAsync();
                             newFile.Close();
                         }
+                        continue;
                     }
 
                     #endregion Check if Gallery and Download.
+
+                    #region Check if Video and continue if so
+
+                    if (!Uri.TryCreate(dlInfo.DownloadURL, UriKind.RelativeOrAbsolute, out Uri? parsedUri) && dlInfo.FileTypes is not FileTypes.Video)
+                    {
+                        throw new InvalidProgramException($"URI Parse Failed! URL is {dlInfo.DownloadURL}");
+                    }
+                    else if (dlInfo.FileTypes is FileTypes.Video)
+                    {
+                        AnsiConsole.MarkupLine("Video Downloading is not implemented yet.");
+                        continue;
+                    }
+
+                    #endregion Check if Video and continue if so
 
                     #region Check if Image and Download.
 

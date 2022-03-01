@@ -19,9 +19,9 @@ jobs:
         
     - name: Build And Test!
       run: |
-        chmod +x TestBuild.sh && ./TestBuild.sh && ls /home/runner/work/Meme-Downloader-2022/Meme-Downloader-2022/build/
+        chmod +x TestBuild.sh && ./TestBuild.sh
       
     - uses: actions/upload-artifact@v2
       with:
           name: Things-The-Bot-Downloaded.zip
-          path: './home/runner/work/Meme-Downloader-2022/Meme-Downloader-2022/build/Downloaded Content'
+          path: './build/Downloaded Content'

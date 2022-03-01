@@ -6,6 +6,7 @@ using Spectre.Console;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -123,7 +124,14 @@ public static class MainActivity
 
         #region Add to PATH Var (Process Only)
 
-        Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + $";{Environment.CurrentDirectory}\\Dependencies\\", EnvironmentVariableTarget.Process);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + $";{Environment.CurrentDirectory}\\Dependencies\\", EnvironmentVariableTarget.Process);
+        }
+        else
+        {
+            Environment.SetEnvironmentVariable("$PATH", Environment.GetEnvironmentVariable("$PATH") + $";{Environment.CurrentDirectory}/Dependencies/", EnvironmentVariableTarget.Process);
+        }
 
         #endregion Add to PATH Var (Process Only)
 

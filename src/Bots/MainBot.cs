@@ -242,11 +242,11 @@ public class BotMain
                 await Logger.LOGE("ERROR DISABLING BOT IN LIST!", "BotLogic -> Exception Handler");
             }
 
-            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an [red]error." +
+            AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name.RemoveMarkup()} - Has ended it's task due to an [red]error." +
                 "\r\n" +
                 $"An Exception occured in \'{this.GetType()}\'! Stack Trace:\r\n" +
                 "[yellow]--------BEGIN STACK TRACE[/]\r\n" +
-                $"{ex}\r\n" +
+                $"{ex.ToString().RemoveMarkup()}\r\n" +
                 "[yellow]--------END STACK TRACE[/][/]\r\n");
             crashArgs.exception = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dottik.MemeDownloader.Utilities;
+using System.Linq.Expressions;
 
 namespace Dottik.MemeDownloader.Downloader;
 
@@ -35,7 +36,14 @@ public static class MainDownloader
             fileInfo.isNSFW = (bool)Result["over_18"];
             fileInfo.PostTitle = (string)Result["title"];
 
-            isGif = (bool?)Result["secure_media"]["reddit_video"]["is_gif"] is not null && (bool)Result["secure_media"]["reddit_video"]["is_gif"];
+            try
+            {
+                isGif = (bool)Result["secure_media"]["reddit_video"]["is_gif"];
+            }
+            catch
+            {
+                isGif = false;
+            }
         });
         await Task.Run(async () =>
         {

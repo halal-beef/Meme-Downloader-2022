@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Transactions;
 
 namespace Dottik.MemeDownloader.Downloader;
 
@@ -38,7 +39,7 @@ public static class RedditVideo
     public static async Task<Stream[]> GetRedditVideoAsync(RedditVideoInformation videoInformation)
     {
         Stream[] videoAndAudio;
-        List<Task<Stream>> downloaderTasks = new List<Task<Stream>>();
+        List<Task<Stream>> downloaderTasks = new();
         if (videoInformation.isAudioValid)
         {
             videoAndAudio = new Stream[2];
@@ -71,6 +72,7 @@ public static class RedditVideo
                 if (!endedTask.IsFaulted)
                     videoAndAudio[1] = endedTask.Result;
             }
+
             await Task.Run(() => downloaderTasks.Remove(endedTask));
         }
 
@@ -103,16 +105,18 @@ public static class RedditVideo
         ProcessStartInfo ffmpegPSI = new()
         {
             Arguments = $"-i \"{videoPath}\" -i \"{audioPath}\" -vcodec copy -map 0:v -map 1:a \"{finalName}\"", // Set args to merge/remux vid.
-            CreateNoWindow = false, // Make no Windows
+            CreateNoWindow = true, // Make no Windows
             WindowStyle = ProcessWindowStyle.Hidden, // Make WindowStyle hidden
-            FileName = "ffmpeg" // Set ffmpeg for windows.
+            UseShellExecute = true
         };
         Process ffmpegProc = new()
         {
             StartInfo = ffmpegPSI // Set Start info to be ffmpegPSI
         };
-#if LINUX
-ffmpegPSI.FileName = $"{Environment.CurrentDirectory}/Dependencies/ffmpeg";
+#if WINDOWS
+        ffmpegPSI.FileName = $"{Environment.CurrentDirectory}\\Dependencies\\ffmpeg.exe";
+#elif LINUX
+        ffmpegPSI.FileName = $"{Environment.CurrentDirectory}/Dependencies/ffmpeg";
 #endif
 
         ffmpegProc.Start();

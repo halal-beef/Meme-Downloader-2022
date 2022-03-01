@@ -20,7 +20,7 @@ public static class BotEvents
 
     public class BotCrashArgs : EventArgs
     {
-        public Exception exception { get; set; }
+        public Exception Exception_ { get; set; }
     }
 
     public class BotCreationArgs : EventArgs
@@ -46,7 +46,7 @@ public class BotMain
         await Logger.LOGE(
             $"An Exception occured in \'{sender?.GetType()}\'! Stack Trace:\r\n" +
             "--------BEGIN STACK TRACE\r\n" +
-            $"{arguments.exception?.ToString()}\r\n" +
+            $"{arguments.Exception_?.ToString()}\r\n" +
             "--------END STACK TRACE",
             "BotLogic");
     }
@@ -98,6 +98,7 @@ public class BotMain
                             await newFile.DisposeAsync();
                             newFile.Close();
                         }
+
                         continue;
                     }
 
@@ -137,7 +138,7 @@ public class BotMain
 
                             // Send the data from downloaded streams to the files.
                             await dataStreams[0].CopyToAsync(tempVidFStream);
-                            await dataStreams[1].CopyToAsync(tempVidFStream);
+                            await dataStreams[1].CopyToAsync(tempAudFStream);
 
                             // Flush, Dispose and Close streams.
                             EnvironmentUtilities.DestroyStreams(dataStreams);
@@ -168,7 +169,6 @@ public class BotMain
                             // Delete temporal files
                             File.Delete(tempVidPath);
                             File.Delete(tempAudPath);
-
                             try
                             {
                                 // If the final file is not valid, delete.
@@ -248,7 +248,7 @@ public class BotMain
                 "[yellow]--------BEGIN STACK TRACE[/]\r\n" +
                 $"{ex.ToString().RemoveMarkup()}\r\n" +
                 "[yellow]--------END STACK TRACE[/][/]\r\n");
-            crashArgs.exception = ex;
+            crashArgs.Exception_ = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);
         }
     }
@@ -295,7 +295,7 @@ public class BotMain
         catch (Exception ex)
         {
             AnsiConsole.MarkupLine("Bot Restarter Has ended it's task due to an [red]error[/].");
-            crashArgs.exception = ex;
+            crashArgs.Exception_ = ex;
             BotEvents.OnBotCrash?.Invoke(this, crashArgs);
         }
     }
@@ -336,7 +336,6 @@ public class BotMain
 
         #endregion Start the bots with a loop
 
-        BotConfigurations.threadAmount = _threadAmount;
         await BotRestarter();
         await Task.Delay(-1); // Avoid program's termination.
     }
@@ -358,9 +357,4 @@ public struct BotConfigurations
     /// The target subreddits.
     /// </summary>
     public static volatile string[] targetSubreddits;
-
-    /// <summary>
-    /// The amount of threads in which bots should exist.
-    /// </summary>
-    public static volatile int threadAmount;
 }

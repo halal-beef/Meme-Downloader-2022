@@ -97,7 +97,7 @@ public static class GetRedditGallery
     /// Download images as a List of Streams.
     /// </summary>
     /// <param name="_formattedLinkData"></param>
-    /// <exception cref="Exception">Thrown if the Gallery data is invalid.</exception>
+    /// <Exception_ cref="Exception">Thrown if the Gallery data is invalid.</Exception_>
     /// <returns>A List of streams containing the data of images.</returns>
     public static async Task<List<Stream>> GetGalleryAsync(FormattedLinks _formattedLinkData)
     {
@@ -127,10 +127,10 @@ public static class GetRedditGallery
                     catch (Exception ex)
                     {
                         await Logger.LOGE($"Bot {Thread.CurrentThread.Name} Could not get image from gallery with error \'{ex.Message}\'. " +
-                            $"Full Stack Trace -> \r\n" +
-                            $"--------START STACK TRACE\r\n" +
+                            "Full Stack Trace -> \r\n" +
+                            "--------START STACK TRACE\r\n" +
                             $"{ex}\r\n" +
-                            $"--------END STACK TRACE\r\n",
+                            "--------END STACK TRACE\r\n",
                             "Downloader -> GetGalleryAsync()");
                     }
                     finally { taskStreams.RemoveAt(i); }

@@ -7,17 +7,19 @@ namespace Dottik.MemeDownloader;
 
 public static class EnvironmentConfig
 {
-#pragma warning disable CS1998
-    private static readonly Stream stub;
+#pragma warning disable CS1998 // async method without await -> Disable
     public static bool FFFMPEGBad { get; private set; }
 
     public static async Task<bool> CheckDependencyState()
     {
 #nullable enable
+#pragma warning disable CS0168 // Unused var warn -> Disable
         bool[]? passes = new bool[1];
         string? localPath = Environment.CurrentDirectory;
         string? expected_ffmpegHash;
         SHA256? sha256Gen = SHA256.Create();
+        Stream ffmpegStream;
+#pragma warning restore CS0168 // Unused var warn -> Restore
 #nullable restore
 
 #if WINDOWS
@@ -25,7 +27,7 @@ public static class EnvironmentConfig
         // Compute FFMPEG Exe hash, and compare it to the expected one.
         if (File.Exists(localPath + "\\Dependencies\\ffmpeg.exe"))
         {
-            Stream ffmpegStream = File.OpenRead(localPath + "\\Dependencies\\ffmpeg.exe");
+            ffmpegStream = File.OpenRead(localPath + "\\Dependencies\\ffmpeg.exe");
             string ffmpegHash = HashToString(await sha256Gen.ComputeHashAsync(ffmpegStream));
             await ffmpegStream.DisposeAsync();
             ffmpegStream.Close();
@@ -37,7 +39,7 @@ public static class EnvironmentConfig
         // Compute FFMPEG binary hash, and compare it to the expected one.
         if (File.Exists(localPath + "/Dependencies/ffmpeg"))
         {
-            Stream ffmpegStream = File.OpenRead(localPath + "/Dependencies/ffmpeg");
+            ffmpegStream = File.OpenRead(localPath + "/Dependencies/ffmpeg");
             string ffmpegHash = HashToString(await sha256Gen.ComputeHashAsync(ffmpegStream));
             await ffmpegStream.DisposeAsync();
             ffmpegStream.Close();
@@ -102,5 +104,5 @@ public static class EnvironmentConfig
 
     private static string HashToString(byte[] hash) => BitConverter.ToString(hash);
 
-#pragma warning restore CS1998
+#pragma warning restore CS1998 // async method without await -> Restore
 }

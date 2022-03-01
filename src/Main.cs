@@ -126,7 +126,7 @@ public static class MainActivity
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + $";{Environment.CurrentDirectory}\\Dependencies\\", EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + $"{Environment.CurrentDirectory}\\Dependencies\\;", EnvironmentVariableTarget.Process);
         }
 
         #endregion Add to PATH Var (Process Only)

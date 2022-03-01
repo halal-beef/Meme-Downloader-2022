@@ -9,8 +9,9 @@ public struct ProgramData
 {
     #region Static Methods & Variables
 
-    public static readonly CookieContainer container = new();
+    public static readonly CookieContainer cookie_container = new();
 
+    // Used just for logs and maybe other stuff.
     public const int versionCode = 01;
 
     // Used just for logs and maybe other stuff
@@ -20,11 +21,13 @@ public struct ProgramData
     {
         SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
         AutomaticDecompression = DecompressionMethods.All,
-        CookieContainer = container,
-        UseCookies = true
+        CookieContainer = cookie_container,
+        UseCookies = true,
+        UseProxy = false,
+        AllowAutoRedirect = true,
+        PreAuthenticate = false
     };
 
-    // Used just for logs and maybe other stuff.
     public static HttpClient Client { get; private set; }
 
     /// <summary>
@@ -59,7 +62,7 @@ public struct JSONData
     /// Should the program download NSFW?
     /// </summary>
     [JsonProperty("Allow NSFW")]
-    public bool allowNSFW = false;
+    public bool allowNSFW;
 
     /// <summary>
     /// Should the program run in more than one thread?

@@ -37,18 +37,6 @@ public static class RedditVideo
     /// <returns>An array of <see cref="Stream"/> containing the Streams of the Reddit Video and Audio(IF VALID)</returns>
     public static async Task<Stream[]> GetRedditVideoAsync(RedditVideoInformation videoInformation)
     {
-        Func<string, Stream> GetStreamFromWeb = new(target =>
-        {
-            HttpResponseMessage msg = new();
-
-            msg = ProgramData.Client.GetAsync(target).Result;
-
-            // Throw exception if status code does not indicate success
-            msg.EnsureSuccessStatusCode();
-
-            return msg.Content.ReadAsStream();
-        });
-
         Stream[] videoAndAudio;
         List<Task<Stream>> downloaderTasks = new List<Task<Stream>>();
         if (videoInformation.isAudioValid)
@@ -60,11 +48,13 @@ public static class RedditVideo
             videoAndAudio = new Stream[1];
         }
 
-        Task<Stream> vidDl = Task.Run(() => GetStreamFromWeb(videoInformation.VideoLink));
+        Task<Stream> vidDl = ProgramData.Client.GetStreamAsync(videoInformation.VideoLink);
+        downloaderTasks.Add(vidDl);
 
         if (videoInformation.isAudioValid)
         {
-            Task<Stream> audioDl = Task.Run(() => GetStreamFromWeb(videoInformation.AudioLink));
+            Task<Stream> audioDl = ProgramData.Client.GetStreamAsync(videoInformation.AudioLink);
+            downloaderTasks.Add(audioDl);
         }
 
         while (downloaderTasks.Count > 0)
@@ -81,8 +71,7 @@ public static class RedditVideo
                 if (!endedTask.IsFaulted)
                     videoAndAudio[1] = endedTask.Result;
             }
-            // Continue with the work while this removes the task.   A - S  Y  N  C    W  O  R  K  L  O  A  D
-            Task.Run(() => downloaderTasks.Remove(endedTask));
+            await Task.Run(() => downloaderTasks.Remove(endedTask));
         }
 
         return videoAndAudio;

@@ -74,12 +74,12 @@ public static class RedditVideo
             if (endedTask == vidDl)
             {
                 if (!endedTask.IsFaulted)
-                    videoAndAudio[0] = await endedTask;
+                    videoAndAudio[0] = endedTask.Result;
             }
             else
             {
                 if (!endedTask.IsFaulted)
-                    videoAndAudio[1] = await endedTask;
+                    videoAndAudio[1] = endedTask.Result;
             }
             // Continue with the work while this removes the task.   A - S  Y  N  C    W  O  R  K  L  O  A  D
             Task.Run(() => downloaderTasks.Remove(endedTask));

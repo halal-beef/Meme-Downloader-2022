@@ -128,10 +128,6 @@ public static class MainActivity
         {
             Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + $";{Environment.CurrentDirectory}\\Dependencies\\", EnvironmentVariableTarget.Process);
         }
-        else
-        {
-            Environment.SetEnvironmentVariable("$PATH", Environment.GetEnvironmentVariable("$PATH") + $";{Environment.CurrentDirectory}/Dependencies/", EnvironmentVariableTarget.Process);
-        }
 
         #endregion Add to PATH Var (Process Only)
 

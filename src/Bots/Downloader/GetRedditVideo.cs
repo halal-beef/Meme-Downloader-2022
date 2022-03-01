@@ -105,12 +105,16 @@ public static class RedditVideo
             Arguments = $"-i \"{videoPath}\" -i \"{audioPath}\" \"{finalName}\"", // Set args to merge/remux vid.
             CreateNoWindow = false, // Make no Windows
             WindowStyle = ProcessWindowStyle.Hidden, // Make WindowStyle hidden
-            FileName = "ffmpeg" // Set ffmpeg.
+            FileName = "ffmpeg" // Set ffmpeg for windows.
         };
         Process ffmpegProc = new()
         {
             StartInfo = ffmpegPSI // Set Start info to be ffmpegPSI
         };
+#if LINUX
+ffmpegPSI.FileName = $"{Environment.CurrentDirectory}/Dependencies/ffmpeg";
+#endif
+
         ffmpegProc.Start();
 
         return ffmpegProc.WaitForExitAsync(cancelToken);

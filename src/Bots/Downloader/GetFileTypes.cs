@@ -25,7 +25,7 @@ public static class MainDownloader
         );
         string contentUrl = "";
         string contentDomain = "";
-
+        bool isGif = false;
         await Task.Run(() =>
         {
             contentUrl =
@@ -33,7 +33,9 @@ public static class MainDownloader
 
             contentDomain = (string)Result["domain"];
             fileInfo.isNSFW = (bool)Result["over_18"];
-            fileInfo.PostTitle = ((string)Result["title"]);
+            fileInfo.PostTitle = (string)Result["title"];
+
+            isGif = (bool?)Result["secure_media"]["reddit_video"]["is_gif"] is not null && (bool)Result["secure_media"]["reddit_video"]["is_gif"];
         });
         await Task.Run(async () =>
         {
@@ -44,14 +46,18 @@ public static class MainDownloader
                 fileInfo.FileExtension = "." + contentUrl.Split('.').Last();
                 fileInfo.DownloadURL = contentUrl;
             }
-            else if ((bool)Result["is_video"] || contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv"))
+            else if ((bool)Result["is_video"] || contentUrl.Contains("mp4") || contentUrl.Contains("mov") || contentUrl.Contains("mkv") && isGif is not true)
             {
                 await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found a Video!", "Downloader");
 
                 fileInfo.FileTypes = FileTypes.Video;
-                fileInfo.FileExtension = "." + contentUrl.Split('.').Last();
+
+                if (contentDomain != "v.redd.it")
+                    fileInfo.FileExtension = "." + contentUrl.Split('.').Last();
+                else
+                    fileInfo.FileExtension = ".mp4";
             }
-            else if (contentUrl.Contains("gallery") && contentDomain == "reddit.com")
+            else if (contentUrl.Contains("gallery") && contentDomain is "reddit.com")
             {
                 await Logger.LOGI($"Bot {Thread.CurrentThread.Name} has found an Image Gallery!", "Downloader");
 

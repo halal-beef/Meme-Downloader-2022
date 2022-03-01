@@ -64,4 +64,29 @@ public static class EnvironmentUtilities
 
         return result.ToString();
     }
+
+    /// <summary>
+    /// Flushes, Disposes and closes a stream.
+    /// </summary>
+    /// <param name="inStream">Stream to destroy</param>
+    public static void DestroyStream(in Stream inStream)
+    {
+        inStream.Flush();
+        inStream.Dispose();
+        inStream.Close();
+    }
+
+    /// <summary>
+    /// Flushes, Disposes and closes an array streams.
+    /// </summary>
+    /// <param name="inStreams">Streams to destroy</param>
+    public static void DestroyStreams(in Stream[] inStreams)
+    {
+        for (int i = 0; i < inStreams.Length; i++)
+        {
+            inStreams[i].Flush();
+            inStreams[i].Dispose();
+            inStreams[i].Close();
+        }
+    }
 }

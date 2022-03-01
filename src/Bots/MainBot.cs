@@ -1,9 +1,11 @@
 ﻿using Dottik.MemeDownloader.Downloader;
 using Dottik.MemeDownloader.Logging;
+using Dottik.MemeDownloader.Utilities;
 using Newtonsoft.Json.Linq;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +14,9 @@ namespace Dottik.MemeDownloader.Bots;
 
 public static class BotEvents
 {
-    public static EventHandler<BotCrashArgs> OnBotCrash;
-    public static EventHandler<BotCreationArgs> OnBotCreate;
-    public static EventHandler<BotDownloadArgs> OnBotFinishDownload;
+    public static EventHandler<BotCrashArgs> OnBotCrash { get; set; }
+    public static EventHandler<BotCreationArgs> OnBotCreate { get; set; }
+    public static EventHandler<BotDownloadArgs> OnBotFinishDownload { get; set; }
 
     public class BotCrashArgs : EventArgs
     {
@@ -37,7 +39,7 @@ public static class BotEvents
 public class BotMain
 {
     public static readonly string DownloadPath = Environment.CurrentDirectory + "\\Downloaded Content\\";
-    public static BotMain Instance;
+    public static volatile BotMain Instance;
 
     public static async void TriggerWhenBotCrash(object sender, BotEvents.BotCrashArgs arguments)
     {
@@ -61,6 +63,8 @@ public class BotMain
             {
                 for (int iterator = 0; iterator < BotConfigurations.targetSubreddits?.Length; iterator++)
                 {
+                    string localDlPath = $"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\";
+
                     #region Get JSON
 
                     string _rand_postJson = await PostDownloder.GetRandomPostJson("shitposting");
@@ -88,7 +92,7 @@ public class BotMain
                         for (int i = 0; i < streams.Count; i++)
                         {
                             // TODO: Download Galleries correctly, not just append .jpg to end.
-                            FileStream newFile = File.Create($"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\__GALLERY_{i}_{dlInfo.FileName + ".jpg"}");
+                            FileStream newFile = File.Create($"{localDlPath}__GALLERY_{i}_{dlInfo.FileName + ".jpg"}");
                             await streams?[i].CopyToAsync(newFile);
                             await newFile.FlushAsync();
                             await newFile.DisposeAsync();
@@ -99,25 +103,11 @@ public class BotMain
 
                     #endregion Check if Gallery and Download.
 
-                    #region Check if Video and continue if so
-
-                    if (!Uri.TryCreate(dlInfo.DownloadURL, UriKind.RelativeOrAbsolute, out Uri? parsedUri) && dlInfo.FileTypes is not FileTypes.Video)
-                    {
-                        throw new InvalidProgramException($"URI Parse Failed! URL is {dlInfo.DownloadURL}");
-                    }
-                    else if (dlInfo.FileTypes is FileTypes.Video)
-                    {
-                        AnsiConsole.MarkupLine("Video Downloading is not implemented yet.");
-                        continue;
-                    }
-
-                    #endregion Check if Video and continue if so
-
                     #region Check if Image and Download.
 
                     if (dlInfo.FileTypes == FileTypes.Image)
                     {
-                        FileStream fs = File.Create($"{DownloadPath}\\{BotConfigurations.targetSubreddits[iterator]}\\{dlInfo.FileName}");
+                        FileStream fs = File.Create($"{localDlPath}{dlInfo.FileName}");
                         await ProgramData.Client.GetStreamAsync(dlInfo.DownloadURL).Result.CopyToAsync(fs);
                         await fs.FlushAsync();
                         await fs.DisposeAsync();
@@ -125,6 +115,106 @@ public class BotMain
                     }
 
                     #endregion Check if Image and Download.
+
+                    #region Check if Video and Download.
+
+                    if (dlInfo.FileTypes is FileTypes.Video)
+                    {
+                        CancellationTokenSource cancellerOwner = new();
+                        RedditVideoInformation info = RedditVideo.GetRedditVideoInfo(_rand_postJson);
+                        Stream[] dataStreams = await RedditVideo.GetRedditVideoAsync(info);
+
+                        // Save both streams to a temp file and merge using ffmpeg.
+                        if (info.isAudioValid)
+                        {
+                            // Get two temp files.
+                            string tempVidPath = Path.GetTempFileName();
+                            string tempAudPath = Path.GetTempFileName();
+
+                            // Open a filestream to both.
+                            FileStream tempVidFStream = File.Open(tempVidPath, FileMode.OpenOrCreate);
+                            FileStream tempAudFStream = File.Open(tempAudPath, FileMode.OpenOrCreate);
+
+                            // Send the data from downloaded streams to the files.
+                            await dataStreams[0].CopyToAsync(tempVidFStream);
+                            await dataStreams[1].CopyToAsync(tempVidFStream);
+
+                            // Flush, Dispose and Close streams.
+                            EnvironmentUtilities.DestroyStreams(dataStreams);
+                            EnvironmentUtilities.DestroyStream(tempVidFStream);
+                            EnvironmentUtilities.DestroyStream(tempAudFStream);
+
+                            // Start merging task
+                            Task mergingTask = RedditVideo.MergeVideoAndAudioAsync(tempVidPath, tempAudPath, $"{DownloadPath}\\{dlInfo.FileName}", cancellerOwner.Token);
+
+                            // Create timer and start it to measure the time of the merging.
+                            Stopwatch timePassedSinceStart = new();
+                            timePassedSinceStart.Start();
+
+                            while (!mergingTask.IsCompleted)
+                            {
+                                await Task.Delay(5 * 1000);
+                                // Wait 69 seconds and then cancel the task if it is not done.
+                                if (timePassedSinceStart.ElapsedMilliseconds > 69 * 1000)
+                                {
+                                    // Cancel and break out of while block.
+                                    cancellerOwner.Cancel();
+                                    break;
+                                }
+                            }
+                            // Stop it.
+                            timePassedSinceStart.Stop();
+
+                            // Delete temporal files
+                            File.Delete(tempVidPath);
+                            File.Delete(tempAudPath);
+
+                            try
+                            {
+                                // If the final file is not valid, delete.
+                                FileInfo finalInfo = new($"{DownloadPath}\\{dlInfo.FileName}");
+                                if (finalInfo.Length is 0)
+                                {
+                                    finalInfo.Delete();
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                AnsiConsole.MarkupLine($"[yellow]WARNING[/]: [red]IO ERROR![/] Couldn't delete file in path [red]{DownloadPath}\\{dlInfo.FileName}[/]! \r\n[bold yellow]SysMsg: {ex.Message.RemoveMarkup()}[/]");
+                                await Logger.LOGW($"Failed to delete file in path {DownloadPath}\\{dlInfo.FileName}! \r\n--------BEGIN STACK TRACE\r\n{ex}\r\n--------END STACK TRACE\r\n", "Downloader -> Video and Audio Merger");
+                            }
+                        }
+                        else if (info.isAudioValid)
+                        {
+                            // Get a temp file.
+                            string tempVidPath = Path.GetTempFileName();
+
+                            // Open a filestream to it.
+                            FileStream tempVidFStream = File.Open(tempVidPath, FileMode.OpenOrCreate);
+
+                            // Send the data from downloaded stream to the file.
+                            await dataStreams[0].CopyToAsync(tempVidFStream);
+
+                            // Flush, Dispose and Close streams.
+                            EnvironmentUtilities.DestroyStream(tempVidFStream);
+                            EnvironmentUtilities.DestroyStreams(dataStreams);
+
+                            // If the final file is not valid, delete.
+                            FileInfo finalInfo = new(tempVidPath);
+                            if (finalInfo.Length is 0)
+                            {
+                                // Delete if invalid.
+                                finalInfo.Delete();
+                            }
+                            else
+                            {
+                                // Move to final place.
+                                finalInfo.MoveTo($"{DownloadPath}\\Video-Only_{dlInfo.FileName}");
+                            }
+                        }
+                    }
+
+                    #endregion Check if Video and Download.
 
                     #region Check if unknown, and if so download it as an HTML file.
 
@@ -153,7 +243,7 @@ public class BotMain
             }
 
             AnsiConsole.MarkupLine($"{Thread.CurrentThread.Name} - Has ended it's task due to an [red]error." +
-                $"\r\n" +
+                "\r\n" +
                 $"An Exception occured in \'{this.GetType()}\'! Stack Trace:\r\n" +
                 "[yellow]--------BEGIN STACK TRACE[/]\r\n" +
                 $"{ex}\r\n" +
@@ -233,7 +323,7 @@ public class BotMain
 
         #region Start the bots with a loop
 
-        for (int i = -1; i < _threadAmount; i++)
+        for (int i = 0; i < _threadAmount; i++)
         {
             _args.BotName = $"Bot {i}";
             BotConfigurations.bots.Add(true);
@@ -262,15 +352,15 @@ public struct BotConfigurations
     /// <summary>
     /// Is Running in MultiThreading mode.
     /// </summary>
-    public static bool multiThreaded = false;
+    public static volatile bool multiThreaded = false;
 
     /// <summary>
     /// The target subreddits.
     /// </summary>
-    public static string[] targetSubreddits;
+    public static volatile string[] targetSubreddits;
 
     /// <summary>
     /// The amount of threads in which bots should exist.
     /// </summary>
-    public static int threadAmount;
+    public static volatile int threadAmount;
 }

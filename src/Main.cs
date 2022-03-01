@@ -60,7 +60,7 @@ public static class MainActivity
                     new Thread(() =>
                     {
                         Thread.Sleep(60 * 1000);
-                        AnsiConsole.MarkupLine($"LOG: \r\n\r\n\r\n");
+                        AnsiConsole.MarkupLine("LOG: \r\n\r\n\r\n");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\Logs\\{DateTime.Now.Date.ToString().Replace('/', '.').Split(' ')[0]}.log"));
                         Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -84,13 +84,15 @@ public static class MainActivity
             else
             {
                 await EnvironmentConfig.CheckDependencyState();
-                if (EnvironmentConfig.ffmpegBad is true)
+                if (EnvironmentConfig.FFFMPEGBad)
                 {
                     AnsiConsole.MarkupLine("[green]Dependency ffmpeg failed the integrity test, redownloading...[/]");
                     await EnvironmentConfig.RestoreDependencies(false);
                 }
             }
+
             File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + $"\\Dottik\\MD2022\\{ProgramData.versionCode}.setup");
+
             if (setupMode)
             {
                 JSONData baseJDat = new()

@@ -44,3 +44,44 @@ public struct FileInformation
     public bool isNSFW { get; set; }
     public string PostTitle { get; set; }
 }
+
+public struct RedditVideoInformation
+{
+#nullable enable
+
+    /// <summary>
+    /// The download link of the video
+    /// </summary>
+    public string VideoLink { get; private set; }
+
+    /// <summary>
+    /// The download link of the video's audio.
+    /// </summary>
+    public string? AudioLink { get; private set; }
+
+    /// <summary>
+    /// Is the audio valid?
+    /// </summary>
+    public bool isAudioValid { get; private set; } = false;
+
+    /// <summary>
+    /// Is the video a gif?
+    /// </summary>
+    public bool isGif { get; private set; } = false;
+
+    /// <summary>
+    /// Initialize <see cref="RedditVideoInformation"/>
+    /// </summary>
+    /// <param name="audioLink">The download link of the video's audio.</param>
+    /// <param name="videoLink">The download link of the video</param>
+    /// <param name="isAudioOfVideoValid">Is the audio valid?</param>
+    public RedditVideoInformation(string? audioLink, string videoLink, bool isAudioOfVideoValid, bool isVideoAGif)
+    {
+        VideoLink = videoLink;
+        AudioLink = audioLink;
+        isAudioValid = isAudioOfVideoValid;
+        isGif = isVideoAGif;
+    }
+
+#nullable restore
+}

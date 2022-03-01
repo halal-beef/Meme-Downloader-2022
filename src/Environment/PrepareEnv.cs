@@ -7,8 +7,9 @@ namespace Dottik.MemeDownloader;
 
 public static class EnvironmentConfig
 {
-    private static Stream stub = Stream.Null;
-    public static bool ffmpegBad { get; private set; }
+#pragma warning disable CS1998
+    private static readonly Stream stub;
+    public static bool FFFMPEGBad { get; private set; }
 
     public static async Task<bool> CheckDependencyState()
     {
@@ -45,7 +46,7 @@ public static class EnvironmentConfig
         else { passes[0] = false; }
 #endif
         // Set vars
-        ffmpegBad = !passes[0];
+        FFFMPEGBad = !passes[0];
         // Dispose Elements.
         sha256Gen.Dispose();
         GC.Collect();
@@ -55,7 +56,7 @@ public static class EnvironmentConfig
 
     public static async Task RestoreDependencies(bool overrideChecks = false)
     {
-        if (overrideChecks || ffmpegBad)
+        if (overrideChecks || FFFMPEGBad)
         {
 #if WINDOWS
 
@@ -100,4 +101,6 @@ public static class EnvironmentConfig
     }
 
     private static string HashToString(byte[] hash) => BitConverter.ToString(hash);
+
+#pragma warning restore CS1998
 }

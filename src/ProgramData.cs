@@ -9,12 +9,12 @@ public struct ProgramData
 {
     #region Static Methods & Variables
 
-    public static CookieContainer container = new();
+    public static readonly CookieContainer container = new();
 
-    public static int versionCode = 01;
+    public const int versionCode = 01;
 
     // Used just for logs and maybe other stuff
-    public static string versionName = "v0.0.1-dev";
+    public const string versionName = "v0.0.1-dev";
 
     private static readonly HttpClientHandler httpHandler = new()
     {

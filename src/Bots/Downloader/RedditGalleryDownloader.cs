@@ -64,7 +64,7 @@ public static class GetRedditGallery
                 string extmp = extensionTemp.ToString();
                 string exfinal = "";
                 
-                _galleryData.Extensions.Add(Path.GetExtension(extmp););
+                _galleryData.Extensions.Add(Path.GetExtension(extmp));
                 exfinal = _galleryData.Extensions.Last();
 
                 _galleryData.Links.Add($"https://i.redd.it/{_linksId[i]}{exfinal}");

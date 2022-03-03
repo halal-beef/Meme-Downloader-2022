@@ -63,25 +63,9 @@ public static class GetRedditGallery
                 extensionTemp?.Append(_mediaExtension?[_linksId[i]]?["m"]?.ToString());
                 string extmp = extensionTemp.ToString();
                 string exfinal = "";
-                // Get Extension.
-                /*if (extmp.Contains("jpg"))
-                {
-                    _galleryData.Extensions.Add(".jpg");
-                    exfinal = ".jpg";
-                }
-                else if (extmp.Contains("png"))
-                {
-                    _galleryData.Extensions.Add(".png");
-                    exfinal = ".png";
-                }
-                else if (extmp.Contains("jpeg"))
-                {
-                    _galleryData.Extensions.Add(".jpeg");
-                    exfinal = ".jpeg";
-                }*/ //Cringe
-                string exte = Path.GetExtension(extmp);
-                _galleryData.Extension.Add(exte);
-                exfinal = exte;
+                
+                _galleryData.Extensions.Add(Path.GetExtension(extmp););
+                exfinal = _galleryData.Extensions.Last();
 
                 _galleryData.Links.Add($"https://i.redd.it/{_linksId[i]}{exfinal}");
             }

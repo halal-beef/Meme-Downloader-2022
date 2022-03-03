@@ -64,7 +64,7 @@ public static class GetRedditGallery
                 string extmp = extensionTemp.ToString();
                 string exfinal = "";
                 // Get Extension.
-                if (extmp.Contains("jpg"))
+                /*if (extmp.Contains("jpg"))
                 {
                     _galleryData.Extensions.Add(".jpg");
                     exfinal = ".jpg";
@@ -78,7 +78,10 @@ public static class GetRedditGallery
                 {
                     _galleryData.Extensions.Add(".jpeg");
                     exfinal = ".jpeg";
-                }
+                }*/ //Cringe
+                string exte = Path.GetExtension(extmp);
+                _galleryData.Extension.Add(exte);
+                exfinal = exte;
 
                 _galleryData.Links.Add($"https://i.redd.it/{_linksId[i]}{exfinal}");
             }

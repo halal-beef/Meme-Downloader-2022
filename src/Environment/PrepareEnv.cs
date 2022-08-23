@@ -23,7 +23,7 @@ public static class EnvironmentConfig
 #nullable restore
 
 #if WINDOWS
-        expected_ffmpegHash = "c54ab015637c845aa053e94a4ed769915610c0628490e3f33e98e4763f61a804";
+        expected_ffmpegHash = "2ba532031384cc2b98c7599702719eae87eccd1c0f34bdb460a67bf732a89ce8";
         // Compute FFMPEG Exe hash, and compare it to the expected one.
         if (File.Exists(localPath + "\\Dependencies\\ffmpeg.exe"))
         {
@@ -67,7 +67,7 @@ public static class EnvironmentConfig
             string tempDLPath = Path.GetTempFileName();
             FileStream tmpPth = File.OpenWrite(tempDLPath);
 
-            await ProgramData.Client.GetStreamAsync("https://github.com/usrDottik/Stuff/releases/download/fmpgwin/ffmpeg.exe").Result.CopyToAsync(tmpPth);
+            await ProgramData.Client.GetStreamAsync("https://github.com/halal-beef/MD2016-FFMPEG-MIRRORS/releases/download/MD2022WIN/ffmpeg.exe").Result.CopyToAsync(tmpPth);
 
             // Flush and Dispose!
             await tmpPth.FlushAsync();
